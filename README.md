@@ -14,7 +14,7 @@ DoubleCache provides this functionality using System.Runtime.Cache.MemoryCache. 
 ##Introduction
 The ICacheAside interface is the main part of DoubleCache, all variants relies on implementations of this single interface. 
 
-<pre><code>
+<code>
 	public interface ICacheAside
 	{
         void Add<T>(string key, T item);
@@ -22,7 +22,7 @@ The ICacheAside interface is the main part of DoubleCache, all variants relies o
         Task<T> GetAsync<T>(string key, Func<Task<T>> dataRetriever) where T : class;
         Task<object> GetAsync(string key, Type type, Func<Task<object>> method);
     }
-</code></pre>
+</code>
 
 DoubleCache comes with the following implementations of this interface
 * LocalCache.MemCache - using System.Runtime.Memory
