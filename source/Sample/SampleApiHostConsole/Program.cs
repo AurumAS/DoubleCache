@@ -17,6 +17,8 @@ namespace CachedAPI
                 // Create HttpCient and make a request to api/values 
                 Console.WriteLine("API running at " + baseAddress);
                 Console.ReadLine();
+
+                //For usage, see the controllers in SampleApiOwin
             }
         }
     }
