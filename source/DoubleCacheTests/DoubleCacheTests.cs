@@ -26,6 +26,23 @@ namespace DoubleCacheTests
         }
 
         [Fact]
+        public void AddWithTimeout_CalledOnBoth()
+        {
+            var local = A.Fake<ICacheAside>();
+            var remote = A.Fake<ICacheAside>();
+
+            var doubleCache =
+                new DoubleCache.DoubleCache(
+                    local,
+                    remote);
+
+            doubleCache.Add("A", "B",TimeSpan.FromMinutes(5));
+
+            A.CallTo(() => local.Add("A", "B", TimeSpan.FromMinutes(5))).MustHaveHappened(Repeated.Exactly.Once);
+            A.CallTo(() => remote.Add("A", "B", TimeSpan.FromMinutes(5))).MustHaveHappened(Repeated.Exactly.Once);
+        }
+
+        [Fact]
         public async Task GetAsync_CalledOnLocal()
         {
             var local = A.Fake<ICacheAside>();

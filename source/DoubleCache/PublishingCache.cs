@@ -20,6 +20,12 @@ namespace DoubleCache
             _cachePublisher.NotifyUpdate(key, item.GetType().AssemblyQualifiedName);
         }
 
+        public void Add<T>(string key, T item, TimeSpan? timeToLive)
+        {
+            _cache.Add<T>(key, item, timeToLive);
+            _cachePublisher.NotifyUpdate(key, item.GetType().AssemblyQualifiedName);
+        }
+
         public Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever)
         {
             Func<Task<object>> wrappedAction = async () => {

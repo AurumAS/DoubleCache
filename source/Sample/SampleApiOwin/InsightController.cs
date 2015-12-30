@@ -15,6 +15,7 @@ namespace CacheSample
     {
         RedisCache _redisCache;
         ConnectionMultiplexer _redisConnection;
+
         public InsightController()
         {
             _redisConnection = ConnectionMultiplexer.Connect("localhost, allowAdmin = true");

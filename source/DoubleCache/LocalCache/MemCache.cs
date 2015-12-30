@@ -6,9 +6,28 @@ namespace DoubleCache.LocalCache
 {
     public class MemCache : ICacheAside
     {
+        TimeSpan? _defaultTtl;
+
+        public MemCache(TimeSpan? defaultTtl)
+        {
+            _defaultTtl = defaultTtl;
+        }
         public void Add<T>(string key, T item)
         {
-           MemoryCache.Default.Set(key, item, DateTimeOffset.UtcNow.AddMinutes(5));
+           var policy = new CacheItemPolicy();
+
+            if (_defaultTtl.HasValue)
+                policy.AbsoluteExpiration = DateTimeOffset.UtcNow.Add(_defaultTtl.Value);
+            MemoryCache.Default.Set(key, item, policy);
+        }
+
+        public void Add<T>(string key, T item, TimeSpan? timeToLive)
+        {
+            var policy = new CacheItemPolicy();
+
+            if (timeToLive.HasValue)
+                policy.AbsoluteExpiration = DateTimeOffset.UtcNow.Add(timeToLive.Value);
+            MemoryCache.Default.Set(key, item, policy);
         }
 
         public async Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever)

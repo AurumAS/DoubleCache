@@ -9,21 +9,33 @@ namespace DoubleCache.Redis
     {
         IDatabase _database;
         IItemSerializer _itemSerializer;
+        TimeSpan? _defaultTtl;
 
-        public RedisCache(IDatabase database, IItemSerializer itemSerializer)
+        public RedisCache(IDatabase database, IItemSerializer itemSerializer, TimeSpan? defaultTtl = null)
         {
             _database = database;
             _itemSerializer = itemSerializer;
+            _defaultTtl = defaultTtl;
+        }
+
+        public void Add<T>(string key, T item, TimeSpan? ttl)
+        {
+            _database.StringSet(
+                key,
+                _itemSerializer.Serialize(item),
+                ttl,
+                When.Always,
+                CommandFlags.FireAndForget);
         }
 
         public void Add<T>(string key, T item)
         {
             _database.StringSet(
-                key,
-                _itemSerializer.Serialize(item),
-                TimeSpan.FromMinutes(5),
-                When.Always,
-                CommandFlags.FireAndForget);
+              key,
+              _itemSerializer.Serialize(item),
+              _defaultTtl,
+              When.Always,
+              CommandFlags.FireAndForget);
         }
 
         public async Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever)

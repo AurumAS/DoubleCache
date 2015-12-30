@@ -18,8 +18,6 @@ namespace CachedAPI
                 Console.WriteLine("API running at " + baseAddress);
                 Console.ReadLine();
             }
-
-          
         }
     }
 }

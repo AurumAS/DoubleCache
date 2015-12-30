@@ -39,6 +39,11 @@ namespace DoubleCache
             _cache.Add<T>(key, item);
         }
 
+        public void Add<T>(string key, T item, TimeSpan? timeToLive)
+        {
+            _cache.Add<T>(key, item, timeToLive);
+        }
+
         public Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever)
         {
             return _cache.GetAsync(key, type, dataRetriever);

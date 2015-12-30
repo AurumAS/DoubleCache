@@ -20,11 +20,19 @@ namespace DoubleCacheTests
         }
 
         [Fact]
-        public void Add__CallsThrough()
+        public void Add_CallsThrough()
         {
             _subscribingCache.Add("a", "b");
 
             A.CallTo(() => _decoratedCache.Add("a", "b")).MustHaveHappened(Repeated.Exactly.Once);
+        }
+
+        [Fact]
+        public void Add_WithTtl_CallsThrough()
+        {
+            _subscribingCache.Add("a", "b", TimeSpan.FromMinutes(1));
+
+            A.CallTo(() => _decoratedCache.Add("a", "b", TimeSpan.FromMinutes(1)).MustHaveHappened(Repeated.Exactly.Once);
         }
 
         [Fact]

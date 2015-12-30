@@ -32,6 +32,14 @@ namespace DoubleCacheTests
         }
 
         [Fact]
+        public void AddWithTtl_DecoratedCache_Called()
+        {
+            _publishingCache.Add("a", "b", TimeSpan.FromMinutes(1));
+
+            A.CallTo(() => _decoratedCache.Add("a", "b", TimeSpan.FromMinutes(1))).MustHaveHappened(Repeated.Exactly.Once);
+        }
+
+        [Fact]
         public void Add_Publisher_Called()
         {
             _publishingCache.Add("a", "b");

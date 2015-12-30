@@ -20,6 +20,12 @@ namespace DoubleCache
             _remoteCache.Add(key, item);
         }
 
+        public void Add<T>(string key, T item, TimeSpan? timeToLive)
+        {
+            _localCache.Add(key, item, timeToLive);
+            _remoteCache.Add(key, item, timeToLive);
+        }
+
         public Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever)
         {
             return _localCache.GetAsync(key, type, () => _remoteCache.GetAsync(key, type, dataRetriever));

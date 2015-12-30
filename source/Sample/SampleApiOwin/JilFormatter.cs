@@ -13,6 +13,7 @@ namespace CacheSample
     public class JilFormatter : MediaTypeFormatter
     {
         private readonly Options _jilOptions;
+
         public JilFormatter()
         {
             _jilOptions = new Options(dateFormat: DateTimeFormat.ISO8601);
@@ -21,6 +22,7 @@ namespace CacheSample
             SupportedEncodings.Add(new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true));
             SupportedEncodings.Add(new UnicodeEncoding(bigEndian: false, byteOrderMark: true, throwOnInvalidBytes: true));
         }
+
         public override bool CanReadType(Type type)
         {
             if (type == null)
