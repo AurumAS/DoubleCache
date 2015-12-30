@@ -5,11 +5,28 @@ A [cache-aside](https://msdn.microsoft.com/en-us/library/dn589799.aspx) implemen
 
 DoubleCache provides synchronized local caches using Redis pub/sub combined with Redis key/value as a fallback if the local cache is empty. 
 
-##Azure Managed Cache retirement
-Having a local cache in front of a sentralized cache is nothing new, and a feature available for the users of [Azure Managed Cache](https://msdn.microsoft.com/en-us/library/azure/dn386096.aspx). On 3rd of December 2015 Microsoft announce the [retirement of Azure Managed Cache](https://azure.microsoft.com/en-us/blog/azure-managed-cache-and-in-role-cache-services-to-be-retired-on-11-30-2016/), the migrate path is to use Azure Redis cache offering. As Microsoft has not made their own client for Redis, they recommend using the [StackExchange.Redis](https://github.com/StackExchange/StackExchange.Redis) client. This client does not provide a local cache feature and the migration document states 
->Local cache: Client applications would need to implement this functionality using a dictionary or similar data structure.
+##Usage
+Add a reference to DoubleCache (nuget coming shortly) and initialize the DoubleCache with a remote and a local cache. 
+```
+var connection = ConnectionMultiplexer.Connect("localhost");
+var serializer = new MsgPackItemSerializer();
+var remoteCache = new RedisCache(connection.GetDatabase(), serializer);
+var _pubSubCache = new DoubleCache.DoubleCache(
+  new SubscribingCache(
+    new DoubleCache.LocalCache.MemCache(), 
+    new RedisSubscriber(connection, remoteCache, serializer)),
+  new PublishingCache(
+    remoteCache, 
+    new RedisPublisher(connection, serializer))); 
+```
+The sample above assumes the local cache must be kept in sync with the remote cache. If sync is not required, the cache can be created without the pub/sub option
 
-DoubleCache provides this functionality using System.Runtime.Cache.MemoryCache. By creating your own implementation of the ICacheAside interface, it is easy to replace the local or remoote cache with your own. 
+```
+var connection = ConnectionMultiplexer.Connect("localhost");
+ _doubleCache = new DoubleCache.DoubleCache(
+  new DoubleCache.LocalCache.MemCache(),
+  new RedisCache(connection.GetDatabase(), new MsgPackItemSerializer()));
+```
 
 ##Introduction
 The ICacheAside interface is the main part of DoubleCache, all variants relies on implementations of this single interface. 
@@ -31,4 +48,9 @@ DoubleCache comes with the following implementations of this interface
 
 Depending on your cache need, you can combine these implementations and decorators as you need. The most complete example would be a DoubleCache which takes a local cache decorated with a SubscribingCache and a RedisCache decorated with a PublishingCache. This will result in a local cache which will be in sync with the other local caches, if a value isn't found the value will be retrieved from Redis before ultimatley resolved using the func provided to the cache.
  
+##Azure Managed Cache retirement
+Having a local cache in front of a sentralized cache is nothing new, and a feature available for the users of [Azure Managed Cache](https://msdn.microsoft.com/en-us/library/azure/dn386096.aspx). On 3rd of December 2015 Microsoft announce the [retirement of Azure Managed Cache](https://azure.microsoft.com/en-us/blog/azure-managed-cache-and-in-role-cache-services-to-be-retired-on-11-30-2016/), the migrate path is to use Azure Redis cache offering. As Microsoft has not made their own client for Redis, they recommend using the [StackExchange.Redis](https://github.com/StackExchange/StackExchange.Redis) client. This client does not provide a local cache feature and the migration document states 
+>Local cache: Client applications would need to implement this functionality using a dictionary or similar data structure.
+
+DoubleCache provides this functionality using System.Runtime.Cache.MemoryCache. By creating your own implementation of the ICacheAside interface, it is easy to replace the local or remoote cache with your own. 
 
