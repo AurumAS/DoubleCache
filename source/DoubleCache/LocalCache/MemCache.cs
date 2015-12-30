@@ -8,7 +8,7 @@ namespace DoubleCache.LocalCache
     {
         TimeSpan? _defaultTtl;
 
-        public MemCache(TimeSpan? defaultTtl)
+        public MemCache(TimeSpan? defaultTtl = null)
         {
             _defaultTtl = defaultTtl;
         }
