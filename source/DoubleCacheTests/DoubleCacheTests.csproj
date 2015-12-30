@@ -72,11 +72,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IntegrationTests\CacheImplementationTests.cs" />
     <Compile Include="DoubleCacheTests.cs" />
-    <Compile Include="MemoryCacheTests.cs" />
+    <Compile Include="IntegrationTests\MemoryCacheTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PublisherTests.cs" />
     <Compile Include="PublishingCacheTests.cs" />
+    <Compile Include="IntegrationTests\RedisCacheIntegrationTests.cs" />
     <Compile Include="RedisFixture.cs" />
     <Compile Include="RedisSubscriberTests.cs" />
     <Compile Include="SerializerImplementations.cs" />

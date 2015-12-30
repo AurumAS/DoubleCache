@@ -32,7 +32,7 @@ namespace DoubleCacheTests
         {
             _subscribingCache.Add("a", "b", TimeSpan.FromMinutes(1));
 
-            A.CallTo(() => _decoratedCache.Add("a", "b", TimeSpan.FromMinutes(1)).MustHaveHappened(Repeated.Exactly.Once);
+            A.CallTo(() => _decoratedCache.Add("a", "b", TimeSpan.FromMinutes(1))).MustHaveHappened(Repeated.Exactly.Once);
         }
 
         [Fact]
