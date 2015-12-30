@@ -26,13 +26,13 @@ namespace DoubleCache.Redis
                 CommandFlags.FireAndForget);
         }
 
-        public async Task<object> GetAsync(string key, Type type, Func<Task<object>> method)
+        public async Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever)
         {
             var packedBytes = await _database.StringGetAsync(key);
             if (!packedBytes.IsNull)
                 return _itemSerializer.Deserialize(packedBytes, type);
 
-            var item = await method.Invoke();
+            var item = await dataRetriever.Invoke();
             if (item != null && item.GetType() == type)
             {
                 Add(key, item);
@@ -42,13 +42,13 @@ namespace DoubleCache.Redis
             return null;
         }
 
-        public async Task<T> GetAsync<T>(string key, Func<Task<T>> method) where T : class
+        public async Task<T> GetAsync<T>(string key, Func<Task<T>> dataRetriever) where T : class
         {
             var packedBytes = await _database.StringGetAsync(key);
             if (!packedBytes.IsNull)
                 return _itemSerializer.Deserialize<T>(packedBytes);
 
-            var item = await method.Invoke();
+            var item = await dataRetriever.Invoke();
             Add(key, item);
             return item;
         }

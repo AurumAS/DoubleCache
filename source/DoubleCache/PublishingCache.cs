@@ -20,10 +20,10 @@ namespace DoubleCache
             _cachePublisher.NotifyUpdate(key, item.GetType().AssemblyQualifiedName);
         }
 
-        public Task<object> GetAsync(string key, Type type, Func<Task<object>> method)
+        public Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever)
         {
             Func<Task<object>> wrappedAction = async () => {
-                var result = await method.Invoke();
+                var result = await dataRetriever.Invoke();
                 var qualifiedTypeName = result.GetType().AssemblyQualifiedName;
                 _cachePublisher.NotifyUpdate(key, qualifiedTypeName);
                 return result;
@@ -32,10 +32,10 @@ namespace DoubleCache
             return  _cache.GetAsync(key, type, wrappedAction);
         }
 
-        public Task<T> GetAsync<T>(string key, Func<Task<T>> method) where T : class
+        public Task<T> GetAsync<T>(string key, Func<Task<T>> dataRetriever) where T : class
         {
             return  _cache.GetAsync(key, async() => {
-                var result = await method.Invoke();
+                var result = await dataRetriever.Invoke();
                 _cachePublisher.NotifyUpdate(key, result.GetType().AssemblyQualifiedName);
                 return result;
             });

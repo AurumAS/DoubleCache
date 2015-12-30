@@ -20,14 +20,14 @@ namespace DoubleCache
             _remoteCache.Add(key, item);
         }
 
-        public Task<object> GetAsync(string key, Type type, Func<Task<object>> method)
+        public Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever)
         {
-            return _localCache.GetAsync(key, type, () => _remoteCache.GetAsync(key, type, method));
+            return _localCache.GetAsync(key, type, () => _remoteCache.GetAsync(key, type, dataRetriever));
         }
 
-        public Task<T> GetAsync<T>(string key, Func<Task<T>> method) where T : class
+        public Task<T> GetAsync<T>(string key, Func<Task<T>> dataRetriever) where T : class
         {
-            return _localCache.GetAsync(key, () => _remoteCache.GetAsync(key, method));
+            return _localCache.GetAsync(key, () => _remoteCache.GetAsync(key, dataRetriever));
         }
     }
 }
