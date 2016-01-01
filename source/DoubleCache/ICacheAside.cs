@@ -9,6 +9,9 @@ namespace DoubleCache
         void Add<T>(string key, T item, TimeSpan? timeToLive);
 
         Task<T> GetAsync<T>(string key, Func<Task<T>> dataRetriever) where T : class;
+        Task<T> GetAsync<T>(string key, Func<Task<T>> dataRetriever, TimeSpan? timeToLive) where T : class;
+
         Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever);
+        Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever, TimeSpan? timeToLive);
     }
 }

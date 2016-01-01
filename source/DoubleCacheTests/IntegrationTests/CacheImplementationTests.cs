@@ -24,11 +24,31 @@ namespace DoubleCacheTests.IntegrationTests
         }
 
         [Fact]
+        public async Task GetAsync_WithTimeToLive_ExistingValue_ReturnsValue()
+        {
+            _cacheImplementation.Add(_key, "A");
+
+            var result = await _cacheImplementation.GetAsync<string>(_key, null, TimeSpan.FromSeconds(1));
+
+            result.ShouldBe("A");
+        }
+
+        [Fact]
         public async Task GetAsyncGeneric_NoValue_CallsMethod()
         {
             var func = A.Fake<Func<Task<string>>>();
 
             var result = await _cacheImplementation.GetAsync(_key, func);
+
+            A.CallTo(() => func.Invoke()).MustHaveHappened(Repeated.Exactly.Once);
+        }
+
+        [Fact]
+        public async Task GetAsyncGeneric_WithTimeToLive_NoValue_CallsMethod()
+        {
+            var func = A.Fake<Func<Task<string>>>();
+
+            var result = await _cacheImplementation.GetAsync(_key, func, TimeSpan.FromSeconds(1));
 
             A.CallTo(() => func.Invoke()).MustHaveHappened(Repeated.Exactly.Once);
         }
@@ -56,6 +76,16 @@ namespace DoubleCacheTests.IntegrationTests
         }
 
         [Fact]
+        public async Task GetAsyncUntyped_WithTimeToLive_ExistingValue_ReturnsValue()
+        {
+            _cacheImplementation.Add(_key, "A");
+
+            var result = await _cacheImplementation.GetAsync(_key, typeof(string), null, TimeSpan.FromSeconds(1));
+
+            result.ShouldBe("A");
+        }
+
+        [Fact]
         public async Task GetAsyncUntyped_NoValue_CallsMethod()
         {
             var func = A.Fake<Func<Task<object>>>();
@@ -73,6 +103,18 @@ namespace DoubleCacheTests.IntegrationTests
             A.CallTo(() => func.Invoke()).Returns("A");
 
             var result = await _cacheImplementation.GetAsync(_key, typeof(string), func);
+
+            result.ShouldBe("A");
+        }
+
+        [Fact]
+        public async Task GetAsyncUntyped_WithTimeToLive_NoValue_CachePopulated()
+        {
+            var func = A.Fake<Func<Task<object>>>();
+
+            A.CallTo(() => func.Invoke()).Returns("A");
+
+            var result = await _cacheImplementation.GetAsync(_key, typeof(string), func, TimeSpan.FromSeconds(1));
 
             result.ShouldBe("A");
         }

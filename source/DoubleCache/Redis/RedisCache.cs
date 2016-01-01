@@ -18,16 +18,6 @@ namespace DoubleCache.Redis
             _defaultTtl = defaultTtl;
         }
 
-        public void Add<T>(string key, T item, TimeSpan? ttl)
-        {
-            _database.StringSet(
-                key,
-                _itemSerializer.Serialize(item),
-                ttl,
-                When.Always,
-                CommandFlags.FireAndForget);
-        }
-
         public void Add<T>(string key, T item)
         {
             _database.StringSet(
@@ -36,6 +26,16 @@ namespace DoubleCache.Redis
               _defaultTtl,
               When.Always,
               CommandFlags.FireAndForget);
+        }
+
+        public void Add<T>(string key, T item, TimeSpan? timeToLive)
+        {
+            _database.StringSet(
+                key,
+                _itemSerializer.Serialize(item),
+                timeToLive,
+                When.Always,
+                CommandFlags.FireAndForget);
         }
 
         public async Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever)
@@ -54,6 +54,22 @@ namespace DoubleCache.Redis
             return null;
         }
 
+        public async Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever, TimeSpan? timeToLive)
+        {
+            var packedBytes = await _database.StringGetAsync(key);
+            if (!packedBytes.IsNull)
+                return _itemSerializer.Deserialize(packedBytes, type);
+
+            var item = await dataRetriever.Invoke();
+            if (item != null && item.GetType() == type)
+            {
+                Add(key, item, timeToLive);
+                return item;
+            }
+
+            return null;
+        }
+
         public async Task<T> GetAsync<T>(string key, Func<Task<T>> dataRetriever) where T : class
         {
             var packedBytes = await _database.StringGetAsync(key);
@@ -62,6 +78,17 @@ namespace DoubleCache.Redis
 
             var item = await dataRetriever.Invoke();
             Add(key, item);
+            return item;
+        }
+
+        public async Task<T> GetAsync<T>(string key, Func<Task<T>> dataRetriever, TimeSpan? timeToLive) where T : class
+        {
+            var packedBytes = await _database.StringGetAsync(key);
+            if (!packedBytes.IsNull)
+                return _itemSerializer.Deserialize<T>(packedBytes);
+
+            var item = await dataRetriever.Invoke();
+            Add(key, item, timeToLive);
             return item;
         }
     }

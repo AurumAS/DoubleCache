@@ -38,6 +38,18 @@ namespace DoubleCache
             return  _cache.GetAsync(key, type, wrappedAction);
         }
 
+        public Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever, TimeSpan? timeToLive)
+        {
+            Func<Task<object>> wrappedAction = async () => {
+                var result = await dataRetriever.Invoke();
+                var qualifiedTypeName = result.GetType().AssemblyQualifiedName;
+                _cachePublisher.NotifyUpdate(key, qualifiedTypeName);
+                return result;
+            };
+
+            return _cache.GetAsync(key, type, wrappedAction,timeToLive);
+        }
+
         public Task<T> GetAsync<T>(string key, Func<Task<T>> dataRetriever) where T : class
         {
             return  _cache.GetAsync(key, async() => {
@@ -45,6 +57,15 @@ namespace DoubleCache
                 _cachePublisher.NotifyUpdate(key, result.GetType().AssemblyQualifiedName);
                 return result;
             });
+        }
+
+        public Task<T> GetAsync<T>(string key, Func<Task<T>> dataRetriever, TimeSpan? timeToLive) where T : class
+        {
+            return _cache.GetAsync(key, async () => {
+                var result = await dataRetriever.Invoke();
+                _cachePublisher.NotifyUpdate(key, result.GetType().AssemblyQualifiedName);
+                return result;
+            }, timeToLive);
         }
     }
 }
