@@ -47,7 +47,7 @@ namespace DoubleCacheTests
         public async Task GetAsync_WithTimeToLive_CallsThrough()
         {
             await _subscribingCache.GetAsync("a", typeof(string), null, TimeSpan.FromSeconds(1));
-            A.CallTo(() => _decoratedCache.GetAsync("a", typeof(string), A<Func<Task<object>>>._,, TimeSpan.FromSeconds(1)))
+            A.CallTo(() => _decoratedCache.GetAsync("a", typeof(string), A<Func<Task<object>>>._, TimeSpan.FromSeconds(1)))
                 .MustHaveHappened(Repeated.Exactly.Once);
         }
 

@@ -1,18 +1,18 @@
 # DoubleCache
-A [cache-aside](https://msdn.microsoft.com/en-us/library/dn589799.aspx) implementation using Redis combined with an in-memory cache. 
+A layered distributed cache implementation following [cache-aside](https://msdn.microsoft.com/en-us/library/dn589799.aspx) and decorator pattern. Backed by Redis, combined with an in-memory cache.  
 
 [Redis](https://github.com/antirez/redis) is a fast, distributed key value store and then some. Using a remote store such as Redis adds two extra costs, IO and serialization. Having a local in-memory object store eliminates these two factors, at the cost of having a local cache on each client. Besides memory management, having multiple cache instances often result in synchronization issues. 
 
 DoubleCache provides synchronized local caches using Redis pub/sub combined with Redis key/value as a fallback if the local cache is empty.  
 
 ###Azure Managed Cache retirement
-Having a local cache in front of a sentralized cache is nothing new, it's a feature available to the users of [Azure Managed Cache](https://msdn.microsoft.com/en-us/library/azure/dn386096.aspx). On December 3rd 2015, Microsoft announced the [retirement of Azure Managed Cache](https://azure.microsoft.com/en-us/blog/azure-managed-cache-and-in-role-cache-services-to-be-retired-on-11-30-2016/), the migrate path is to use the Azure Redis cache offering. As Microsoft has not made their own client for Redis, they recommend using the [StackExchange.Redis](https://github.com/StackExchange/StackExchange.Redis) client. This client does not provide a local cache feature and the migration document states 
+Having a local cache in front of a centralized cache is nothing new, it's a feature available to the users of [Azure Managed Cache](https://msdn.microsoft.com/en-us/library/azure/dn386096.aspx). On December 3rd 2015, Microsoft announced the [retirement of Azure Managed Cache](https://azure.microsoft.com/en-us/blog/azure-managed-cache-and-in-role-cache-services-to-be-retired-on-11-30-2016/), the migrate path is to use the Azure Redis cache offering. As Microsoft has not made their own client for Redis, they recommend using the [StackExchange.Redis](https://github.com/StackExchange/StackExchange.Redis) client. This client does not include a local cache feature and the migration document states 
 >Local cache: Client applications would need to implement this functionality using a dictionary or similar data structure.
 
 DoubleCache provides this functionality using System.Runtime.Cache.MemoryCache. By creating your own implementation of the ICacheAside interface, it is easy to replace the local or remote cache with your own. 
 
 ##Usage
-Add a reference to DoubleCache (nuget coming shortly) and initialize the DoubleCache with a remote and a local cache. 
+Add a reference to DoubleCache (NuGet coming shortly) and initialize the DoubleCache with a remote and a local cache. 
 ```
 var connection = ConnectionMultiplexer.Connect("localhost");
 var serializer = new MsgPackItemSerializer();
@@ -25,7 +25,7 @@ var _pubSubCache = new DoubleCache.DoubleCache(
     remoteCache, 
     new RedisPublisher(connection, serializer))); 
 ```
-The sample above assumes the local cache must be kept in sync with the remote cache. If sync is not required, the cache can be created without the pub/sub option:
+The sample above instantiate a local cache synched with the remote Redis cache. If sync is not required, constructing the cache without pub/sub is a bit simpler
 
 ```
 var connection = ConnectionMultiplexer.Connect("localhost");
@@ -34,7 +34,7 @@ var connection = ConnectionMultiplexer.Connect("localhost");
   new RedisCache(connection.GetDatabase(), new MsgPackItemSerializer()));
 ```
 
-To use the initialized cache, ca
+To use the cache call the GetAsync&lt;T&gt; method. This method takes a Func called dataRetriever. This method should call your repository or other service. The dataRetriever method executes if the requested key does not exist in the cache. The result is added to the cache.
 
 ##Implementation
 The ICacheAside interface is the main part of DoubleCache, all variants relies on implementations of this single interface. 
@@ -47,6 +47,8 @@ public interface ICacheAside
     Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever);
   }
 ```
+The Add method is implemented with fire and forget, hence it does not need to be Async as this is handled by the Stackexchange.Redis client. 
+
 DoubleCache comes with the following implementations of this interface
 * LocalCache.MemCache - using System.Runtime.Memory
 * Redis.RedisCache - using StackExchange.Redis client
