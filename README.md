@@ -34,7 +34,14 @@ var connection = ConnectionMultiplexer.Connect("localhost");
   new RedisCache(connection.GetDatabase(), new MsgPackItemSerializer()));
 ```
 
-To use the cache call the GetAsync&lt;T&gt; method. This method takes a Func called dataRetriever. This method should call your repository or other service. The dataRetriever method executes if the requested key does not exist in the cache. The result is added to the cache.
+To use the cache call the GetAsync&lt;T&gt; method. This method takes a Func called dataRetriever. This method should call your repository or other service. The dataRetriever method executes if the requested key does not exist in the cache, adding the result to the cache.
+ 
+```
+var cacheKey = Request.RequestUri.PathAndQuery;
+_pubSubCache.GetAsync(cacheKey, () => _repo.GetSingleDummyUser()));
+```
+###TimeToLive
+
 
 ##Implementation
 The ICacheAside interface is the main part of DoubleCache, all variants relies on implementations of this single interface. 
@@ -54,7 +61,6 @@ DoubleCache comes with the following implementations of this interface
 * Redis.RedisCache - using StackExchange.Redis client
 * SubscribingCache - a decorator supporting push notifications of cache updates
 * PublishingCache - a decorator publishing cache changes
-* DoubleCache - An implementation using a local and remote cache
-
+* DoubleCache - a decorator wrapping a local and a remote cache
 
 Depending on your cache need, you can combine these implementations and decorators as you need. The most complete example would be a DoubleCache which takes a local cache decorated with a SubscribingCache and a RedisCache decorated with a PublishingCache. This will result in a local cache that will be in sync with the other local caches; if a value isn't found the value will be retrieved from Redis before ultimately being resolved using the func provided to the cache.
