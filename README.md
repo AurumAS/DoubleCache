@@ -12,7 +12,7 @@ Having a local cache in front of a centralized cache is nothing new, it's a feat
 DoubleCache provides this functionality using System.Runtime.Cache.MemoryCache. By creating your own implementation of the ICacheAside interface, it is easy to replace the local or remote cache with your own. 
 
 ##Usage
-Add a reference to DoubleCache (NuGet coming shortly) and initialize the DoubleCache with a remote and a local cache. 
+Add a reference to DoubleCache using nuget `Install-Package DoubleCache` and initialize the DoubleCache with a remote and a local cache. 
 ```
 var connection = ConnectionMultiplexer.Connect("localhost");
 var serializer = new MsgPackItemSerializer();
