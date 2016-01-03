@@ -23,6 +23,10 @@ Target "Clean" (fun _ ->
     CleanDirs [buildDir; testDir; nugetDir]
 )
 
+Target "RestoreNugetPackages" (fun _ ->
+    !! "source/DoubleCache*/packages.config"
+    |> Seq.iter(RestorePackage (fun p -> { p with ToolPath = "./tools/nuget/nuget.exe"
+                                                  OutputPath = "source/packages"})))
 Target "Build" (fun _ ->
     CreateCSharpAssemblyInfo "./source/DoubleCache/Properties/AssemblyInfo.cs"
         [Attribute.Title projectName
@@ -74,6 +78,7 @@ Target "CreateNuget" (fun _ ->
 
 // Dependencies
 "Clean" 
+ ==> "RestoreNugetPackages"
  ==> "Build"
  ==> "BuildTest"
  ==> "xUnitTest"
