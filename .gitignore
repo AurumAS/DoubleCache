@@ -7,6 +7,9 @@
 *.userosscache
 *.sln.docstates
 
+tools/FAKE/
+.FAKE/
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
