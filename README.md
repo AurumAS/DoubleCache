@@ -17,7 +17,8 @@ Add a reference to DoubleCache (NuGet coming shortly) and initialize the DoubleC
 var connection = ConnectionMultiplexer.Connect("localhost");
 var serializer = new MsgPackItemSerializer();
 var remoteCache = new RedisCache(connection.GetDatabase(), serializer);
-var _pubSubCache = new DoubleCache.DoubleCache(
+
+var pubSubCache = new DoubleCache.DoubleCache(
   new SubscribingCache(
     new DoubleCache.LocalCache.MemCache(), 
     new RedisSubscriber(connection, remoteCache, serializer)),
@@ -29,7 +30,8 @@ The sample above instantiate a local cache synched with the remote Redis cache. 
 
 ```
 var connection = ConnectionMultiplexer.Connect("localhost");
- _doubleCache = new DoubleCache.DoubleCache(
+
+var doubleCache = new DoubleCache.DoubleCache(
   new DoubleCache.LocalCache.MemCache(),
   new RedisCache(connection.GetDatabase(), new MsgPackItemSerializer()));
 ```
@@ -38,10 +40,13 @@ To use the cache call the GetAsync&lt;T&gt; method. This method takes a Func cal
  
 ```
 var cacheKey = Request.RequestUri.PathAndQuery;
-_pubSubCache.GetAsync(cacheKey, () => _repo.GetSingleDummyUser()));
+
+pubSubCache.GetAsync(cacheKey, () => _repo.GetSingleDummyUser()));
 ```
 ###TimeToLive
+Lifetime configuration for cache entries is set when creating the local and remote cache. By default the `TimeSpan? defaultTtl` parameter is set to null, leaving the items in the cache without time to live. 
 
+For specific entries, it is possible to override the default lifetime by passing a timespan for the specific item, or null if it should not expire.
 
 ##Implementation
 The ICacheAside interface is the main part of DoubleCache, all variants relies on implementations of this single interface. 
