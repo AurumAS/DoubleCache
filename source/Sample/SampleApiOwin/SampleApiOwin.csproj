@@ -96,11 +96,11 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\DoubleCache\DoubleCache.csproj">
-      <Project>{6c5d1a93-cca6-4cf2-9c76-103021f0a999}</Project>
+      <Project>{6C5D1A93-CCA6-4CF2-9C76-103021F0A999}</Project>
       <Name>DoubleCache</Name>
     </ProjectReference>
     <ProjectReference Include="..\RandomUser\RandomUser.csproj">
-      <Project>{5cd548fd-5f02-4a15-9839-e3457e1cfd58}</Project>
+      <Project>{5CD548FD-5F02-4A15-9839-E3457E1CFD58}</Project>
       <Name>RandomUser</Name>
     </ProjectReference>
   </ItemGroup>
