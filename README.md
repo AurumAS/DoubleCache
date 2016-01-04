@@ -3,7 +3,10 @@ A layered distributed cache implementation following [cache-aside](https://msdn.
 
 [Redis](https://github.com/antirez/redis) is a fast, distributed key value store and then some. Using a remote store such as Redis adds two extra costs, IO and serialization. Having a local in-memory object store eliminates these two factors, at the cost of having a local cache on each client. Besides memory management, having multiple cache instances often result in synchronization issues. 
 
-DoubleCache provides synchronized local caches using Redis pub/sub combined with Redis key/value as a fallback if the local cache is empty.  
+DoubleCache provides synchronized local caches using Redis pub/sub combined with Redis key/value as a fallback if the local cache is empty.
+  
+##Build status
+[![Build status](https://ci.appveyor.com/api/projects/status/pxdwpi3jpqbtd448/branch/master?svg=true)](https://ci.appveyor.com/project/Ulriksen/doublecache/branch/master)
 
 ###Azure Managed Cache retirement
 Having a local cache in front of a centralized cache is nothing new, it's a feature available to the users of [Azure Managed Cache](https://msdn.microsoft.com/en-us/library/azure/dn386096.aspx). On December 3rd 2015, Microsoft announced the [retirement of Azure Managed Cache](https://azure.microsoft.com/en-us/blog/azure-managed-cache-and-in-role-cache-services-to-be-retired-on-11-30-2016/), the migrate path is to use the Azure Redis cache offering. As Microsoft has not made their own client for Redis, they recommend using the [StackExchange.Redis](https://github.com/StackExchange/StackExchange.Redis) client. This client does not include a local cache feature and the migration document states 
