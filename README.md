@@ -11,6 +11,9 @@ Having a local cache in front of a centralized cache is nothing new, it's a feat
 
 DoubleCache provides this functionality using System.Runtime.Cache.MemoryCache. By creating your own implementation of the ICacheAside interface, it is easy to replace the local or remote cache with your own. 
 
+##Build status
+[![Build status](https://ci.appveyor.com/api/projects/status/8qnxdit4rugd7hij?svg=true)](https://ci.appveyor.com/project/BjrnEinarBjarnes/doublecache)
+
 ##Usage
 Add a reference to DoubleCache using nuget `Install-Package DoubleCache` and initialize the DoubleCache with a remote and a local cache. 
 ```
