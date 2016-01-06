@@ -4,7 +4,7 @@
 A layered distributed cache implementation following [cache-aside](https://msdn.microsoft.com/en-us/library/dn589799.aspx) and decorator pattern. Backed by Redis, combined with an in-memory cache.  
 
 ##Usage
-Add a reference to DoubleCache using nuget `Install-Package DoubleCache` and initialize the DoubleCache with a remote and a local cache. 
+Add a reference to DoubleCache using nuget `Install-Package DoubleCache` and initialize the DoubleCache using a factory method, providing redis connection and a serializer.
 ```
 var connection = ConnectionMultiplexer.Connect("localhost");
 var serializer = new MsgPackItemSerializer();
