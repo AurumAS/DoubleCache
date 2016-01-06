@@ -7,6 +7,7 @@ using Xunit;
 
 namespace DoubleCacheTests.IntegrationTests
 {
+    [Trait("Category", "Integration")]
     public class CacheFactoryTests
     {
         [Fact]

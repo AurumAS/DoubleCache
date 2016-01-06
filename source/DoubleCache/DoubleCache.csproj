@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CacheFactory.cs" />
     <Compile Include="CacheUpdateNotification.cs" />
     <Compile Include="DoubleCache.cs" />
     <Compile Include="ICacheAside.cs" />
