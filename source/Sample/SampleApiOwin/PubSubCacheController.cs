@@ -23,11 +23,10 @@ namespace CacheSample
             var connection = ConnectionMultiplexer.Connect("localhost");
             var serializer = new MsgPackItemSerializer();
             var remoteCache = new RedisCache(connection.GetDatabase(), serializer);
-            var _pubSubCache = new DoubleCache.DoubleCache(
+            _pubSubCache = new DoubleCache.DoubleCache(
                 new SubscribingCache(new DoubleCache.LocalCache.MemCache(), new RedisSubscriber(connection, remoteCache, serializer)),
                 new PublishingCache(remoteCache, new RedisPublisher(connection, serializer)));
         }
-
         public PubSubCacheController()
         {
             _repo = new RandomUserRepository();
@@ -36,7 +35,7 @@ namespace CacheSample
         [Route("single")]
         public async Task<IHttpActionResult> GetSingle()
         {
-            return Ok(await _pubSubCache.GetAsync(Request.RequestUri.PathAndQuery, () => _repo.GetSingleDummyUser()));
+             return Ok(await _pubSubCache.GetAsync(Request.RequestUri.PathAndQuery, () => _repo.GetSingleDummyUser()));
         }
 
         [Route("many")]
