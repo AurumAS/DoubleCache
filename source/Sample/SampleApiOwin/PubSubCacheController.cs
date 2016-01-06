@@ -22,10 +22,8 @@ namespace CacheSample
         {
             var connection = ConnectionMultiplexer.Connect("localhost");
             var serializer = new MsgPackItemSerializer();
-            var remoteCache = new RedisCache(connection.GetDatabase(), serializer);
-            _pubSubCache = new DoubleCache.DoubleCache(
-                new SubscribingCache(new DoubleCache.LocalCache.MemCache(), new RedisSubscriber(connection, remoteCache, serializer)),
-                new PublishingCache(remoteCache, new RedisPublisher(connection, serializer)));
+
+            _pubSubCache = DoubleCache.CacheFactory.CreatePubSubDoubleCache(connection, serializer);
         }
         public PubSubCacheController()
         {
