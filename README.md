@@ -3,6 +3,22 @@
 
 A layered distributed cache implementation following [cache-aside](https://msdn.microsoft.com/en-us/library/dn589799.aspx) and decorator pattern. Backed by Redis, combined with an in-memory cache.  
 
+##Usage
+Add a reference to DoubleCache using nuget `Install-Package DoubleCache` and initialize the DoubleCache with a remote and a local cache. 
+```
+var connection = ConnectionMultiplexer.Connect("localhost");
+var serializer = new MsgPackItemSerializer();
+
+_pubSubCache = CacheFactory.CreatePubSubDoubleCache(connection, serializer);
+```
+To use the cache call the GetAsync&lt;T&gt; method. This method takes a Func called dataRetriever. This method should call your repository or other service. The dataRetriever method executes if the requested key does not exist in the cache, adding the result to the cache.
+ 
+```
+var cacheKey = Request.RequestUri.PathAndQuery;
+
+pubSubCache.GetAsync(cacheKey, () => _repo.GetSingleDummyUser()));
+```
+##Why
 [Redis](https://github.com/antirez/redis) is a fast, distributed key value store and then some. Using a remote store such as Redis adds two extra costs, IO and serialization. Having a local in-memory object store eliminates these two factors, at the cost of having a local cache on each client. Besides memory management, having multiple cache instances often result in synchronization issues. 
 
 DoubleCache provides synchronized local caches using Redis pub/sub combined with Redis key/value as a fallback if the local cache is empty.
@@ -13,39 +29,7 @@ Having a local cache in front of a centralized cache is nothing new, it's a feat
 
 DoubleCache provides this functionality using System.Runtime.Cache.MemoryCache. By creating your own implementation of the ICacheAside interface, it is easy to replace the local or remote cache with your own. 
 
-##Usage
-Add a reference to DoubleCache using nuget `Install-Package DoubleCache` and initialize the DoubleCache with a remote and a local cache. 
-```
-var connection = ConnectionMultiplexer.Connect("localhost");
-var serializer = new MsgPackItemSerializer();
-var remoteCache = new RedisCache(connection.GetDatabase(), serializer);
-
-var pubSubCache = new DoubleCache.DoubleCache(
-  new SubscribingCache(
-    new DoubleCache.LocalCache.MemCache(), 
-    new RedisSubscriber(connection, remoteCache, serializer)),
-  new PublishingCache(
-    remoteCache, 
-    new RedisPublisher(connection, serializer))); 
-```
-The sample above instantiate a local cache synched with the remote Redis cache. If sync is not required, constructing the cache without pub/sub is a bit simpler
-
-```
-var connection = ConnectionMultiplexer.Connect("localhost");
-
-var doubleCache = new DoubleCache.DoubleCache(
-  new DoubleCache.LocalCache.MemCache(),
-  new RedisCache(connection.GetDatabase(), new MsgPackItemSerializer()));
-```
-
-To use the cache call the GetAsync&lt;T&gt; method. This method takes a Func called dataRetriever. This method should call your repository or other service. The dataRetriever method executes if the requested key does not exist in the cache, adding the result to the cache.
- 
-```
-var cacheKey = Request.RequestUri.PathAndQuery;
-
-pubSubCache.GetAsync(cacheKey, () => _repo.GetSingleDummyUser()));
-```
-###TimeToLive
+##TimeToLive
 Lifetime configuration for cache entries is set when creating the local and remote cache. By default the `TimeSpan? defaultTtl` parameter is set to null, leaving the items in the cache without time to live. 
 
 For specific entries, it is possible to override the default lifetime by passing a timespan for the specific item, or null if it should not expire.
