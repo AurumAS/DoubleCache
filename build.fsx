@@ -12,7 +12,7 @@ let nugetDir = "./nuget"
 let references  = !! "source/DoubleCache/*.csproj"
 let testReferences = !! "source/DoubleCacheTests/*.csproj"    
 
-let version = "0.2"
+let version = "0.2.1"
 let commitHash = Information.getCurrentSHA1(".")
 
 let projectName = "DoubleCache"
