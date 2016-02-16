@@ -65,6 +65,7 @@
     <Compile Include="Serialization\IItemSerializer.cs" />
     <Compile Include="Serialization\MsgPackItemSerializer.cs" />
     <Compile Include="SubscribingCache.cs" />
+    <Compile Include="TimeToLive.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

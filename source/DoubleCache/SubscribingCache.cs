@@ -56,7 +56,11 @@ namespace DoubleCache
         private async Task CacheUpdateAction(object sender, CacheUpdateNotificationArgs e)
         {
             var remoteItem = await _cacheSubscriber.GetAsync(e.Key, _knownTypes.GetOrAdd(e.Type, Type.GetType(e.Type)));
-            Add(e.Key, remoteItem);
+
+            if (e.SpecificTimeToLive != null)
+                Add(e.Key, remoteItem,e.SpecificTimeToLive._timeToLive);
+            else
+                Add(e.Key, remoteItem);
         }
     }
 }
