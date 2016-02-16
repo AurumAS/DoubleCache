@@ -3,7 +3,9 @@ using DoubleCache.Redis;
 using DoubleCache.Serialization;
 using FakeItEasy;
 using StackExchange.Redis;
+using System;
 using Xunit;
+using Shouldly;
 
 namespace DoubleCacheTests
 {
@@ -39,6 +41,24 @@ namespace DoubleCacheTests
             var publisher = new RedisPublisher(connection, serializer);
 
             publisher.NotifyUpdate("A", "B");
+
+            A.CallTo(() => subscriber.Publish("cacheUpdate", A<RedisValue>.That.Matches(r => ((byte[])r)[0] == 1), CommandFlags.FireAndForget))
+                .MustHaveHappened(Repeated.Exactly.Once);
+        }
+
+        [Fact]
+        public void Publish_WithTimeToLive_PublishCalled()
+        {
+            var connection = A.Fake<IConnectionMultiplexer>();
+            var serializer = A.Fake<IItemSerializer>();
+            var subscriber = A.Fake<ISubscriber>();
+
+            A.CallTo(() => connection.GetSubscriber(null)).Returns(subscriber);
+            A.CallTo(() => connection.ClientName).Returns("C");
+            A.CallTo(() => serializer.Serialize(A<CacheUpdateNotificationArgs>.Ignored)).Returns(new byte[] { 1 });
+            var publisher = new RedisPublisher(connection, serializer);
+
+            publisher.NotifyUpdate("A", "B", TimeSpan.FromMilliseconds(1));
 
             A.CallTo(() => subscriber.Publish("cacheUpdate", A<RedisValue>.That.Matches(r => ((byte[])r)[0] == 1), CommandFlags.FireAndForget))
                 .MustHaveHappened(Repeated.Exactly.Once);

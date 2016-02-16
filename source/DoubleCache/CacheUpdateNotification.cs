@@ -2,6 +2,7 @@
 
 namespace DoubleCache
 {
+    [Serializable]
     public class CacheUpdateNotificationArgs : EventArgs
     {
         public string Key { get; set; }

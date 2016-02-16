@@ -82,7 +82,10 @@
     <Compile Include="IntegrationTests\RedisCacheIntegrationTests.cs" />
     <Compile Include="RedisFixture.cs" />
     <Compile Include="RedisSubscriberTests.cs" />
-    <Compile Include="SerializerImplementations.cs" />
+    <Compile Include="Serialization\CacheNotificationDataAttribute.cs" />
+    <Compile Include="Serialization\ItemSerializerTests.cs" />
+    <Compile Include="Serialization\BinaryItemSerializerTests.cs" />
+    <Compile Include="Serialization\MsgPackItemSerializerTests.cs" />
     <Compile Include="SubscribingCacheTests.cs" />
   </ItemGroup>
   <ItemGroup>

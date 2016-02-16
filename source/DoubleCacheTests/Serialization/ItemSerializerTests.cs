@@ -1,32 +1,16 @@
-﻿using DoubleCache.Serialization;
-
-using Xunit;
+﻿using DoubleCache;
+using DoubleCache.Serialization;
 using Shouldly;
+using System;
 using System.IO;
+using Xunit;
 
 namespace DoubleCacheTests.Serialization
 {
-    public class BinaryItemSerializerTests : ItemSerializerTests
-    {
-        public BinaryItemSerializerTests()
-        {
-            serializer = new BinaryFormatterItemSerializer();
-        }
-    }
-
-    public class MsgPackItemSerializerTests : ItemSerializerTests
-    {
-        public MsgPackItemSerializerTests()
-        {
-            serializer = new MsgPackItemSerializer();
-        }
-    }
-
     public abstract class ItemSerializerTests
     {
-        protected  IItemSerializer serializer;
+        protected IItemSerializer serializer;
 
-        
         [Theory]
         [InlineData("a")]
         public void RoundtripSerializeGeneric<T>(T input)
@@ -37,11 +21,15 @@ namespace DoubleCacheTests.Serialization
         }
         [Theory]
         [InlineData("a")]
+        [CacheNotificationData("test","test",1)]
         public void RoundtripSerialize<T>(T input)
         {
             var result = serializer.Deserialize(serializer.Serialize(input), typeof(T));
 
-            result.ShouldBe(input);
+            result.ShouldBeOfType<T>();
+
+            if (result is string)
+                result.ShouldBe(input);
         }
 
         [Theory]
