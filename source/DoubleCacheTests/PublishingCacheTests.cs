@@ -168,7 +168,7 @@ namespace DoubleCacheTests
             await method.Invoke();
 
             A.CallTo(() => fakeAction.Invoke()).MustHaveHappened(Repeated.Exactly.Once);
-            A.CallTo(() => _publisher.NotifyUpdate("a", typeof(string).AssemblyQualifiedName)).MustHaveHappened(Repeated.Exactly.Once);
+            A.CallTo(() => _publisher.NotifyUpdate("a", typeof(string).AssemblyQualifiedName, TimeSpan.FromSeconds(1))).MustHaveHappened(Repeated.Exactly.Once);
         }
     }
 }

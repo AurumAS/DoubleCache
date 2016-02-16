@@ -77,5 +77,27 @@ namespace DoubleCacheTests
             A.CallTo(() => _decoratedCache.Add<object>("a", "b"))
                 .MustHaveHappened(Repeated.Exactly.Once);
         }
+
+        [Fact]
+        public async Task SubscriberUpdate_WithSpecificTimeToLive_null_ItemAddedWithTimeToLive()
+        {
+            A.CallTo(() => _subscriber.GetAsync("a", A<Type>.Ignored)).Returns("b");
+            _subscriber.CacheUpdate += Raise.With(this, new CacheUpdateNotificationArgs { Key = "a", Type = typeof(string).AssemblyQualifiedName, SpecificTimeToLive = new TimeToLive(null) });
+
+            await Task.Delay(TimeSpan.FromSeconds(1));
+            A.CallTo(() => _decoratedCache.Add<object>("a", "b", null))
+                .MustHaveHappened(Repeated.Exactly.Once);
+        }
+
+        [Fact]
+        public async Task SubscriberUpdate_WithSpecificTimeToLive_value_ItemAddedWithTimeToLive()
+        {
+            A.CallTo(() => _subscriber.GetAsync("a", A<Type>.Ignored)).Returns("b");
+            _subscriber.CacheUpdate += Raise.With(this, new CacheUpdateNotificationArgs { Key = "a", Type = typeof(string).AssemblyQualifiedName, SpecificTimeToLive = new TimeToLive(TimeSpan.FromMinutes(1)) });
+
+            await Task.Delay(TimeSpan.FromSeconds(1));
+            A.CallTo(() => _decoratedCache.Add<object>("a", "b", TimeSpan.FromMinutes(1)))
+                .MustHaveHappened(Repeated.Exactly.Once);
+        }
     }
 }

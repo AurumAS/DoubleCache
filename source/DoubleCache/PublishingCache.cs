@@ -63,7 +63,7 @@ namespace DoubleCache
         {
             return _cache.GetAsync(key, async () => {
                 var result = await dataRetriever.Invoke();
-                _cachePublisher.NotifyUpdate(key, result.GetType().AssemblyQualifiedName);
+                _cachePublisher.NotifyUpdate(key, result.GetType().AssemblyQualifiedName, timeToLive);
                 return result;
             }, timeToLive);
         }
