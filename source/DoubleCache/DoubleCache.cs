@@ -45,5 +45,11 @@ namespace DoubleCache
         {
             return _localCache.GetAsync(key, () => _remoteCache.GetAsync(key, dataRetriever),timeToLive);
         }
+
+        public void Remove(string key)
+        {
+            _localCache.Remove(key);
+            _remoteCache.Remove(key);
+        }
     }
 }

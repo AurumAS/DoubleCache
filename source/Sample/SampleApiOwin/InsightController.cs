@@ -2,7 +2,6 @@
 using DoubleCache.Serialization;
 using RandomUser;
 using StackExchange.Redis;
-using System;
 using System.Collections.Generic;
 using System.Runtime.Caching;
 using System.Threading.Tasks;
@@ -30,7 +29,7 @@ namespace CacheSample
             {
                 case "single":
                     result.Local.Add(MemoryCache.Default.Get("single") as User);
-                    result.Remote.Add(await _redisCache.GetAsync<User>("single", () => null));
+                    result.Remote.Add(await _redisCache.GetAsync("single", () => Task.FromResult<User>(null)));
                     break;
                 case "many":
                     result.Local.AddRange(MemoryCache.Default.Get("many") as List<User>);

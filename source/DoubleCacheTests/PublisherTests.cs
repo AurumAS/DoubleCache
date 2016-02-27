@@ -5,63 +5,74 @@ using FakeItEasy;
 using StackExchange.Redis;
 using System;
 using Xunit;
-using Shouldly;
 
 namespace DoubleCacheTests
 {
     public class PublisherTests
     {
-        [Fact]
-        public void Publish_SerializerCalled()
+        private IConnectionMultiplexer _connection;
+        private IItemSerializer _serializer;
+        private ISubscriber _subscriber;
+
+        private ICachePublisher publisher;
+
+        public PublisherTests()
         {
-            var connection = A.Fake<IConnectionMultiplexer>();
-            var serializer = A.Fake<IItemSerializer>();
+            _connection = A.Fake<IConnectionMultiplexer>();
+            _serializer = A.Fake<IItemSerializer>();
+            _subscriber = A.Fake<ISubscriber>();
 
-            A.CallTo(() => connection.ClientName).Returns("C");
+            A.CallTo(() => _connection.GetSubscriber(null)).Returns(_subscriber);
+            A.CallTo(() => _connection.ClientName).Returns("C");
+            A.CallTo(() => _serializer.Serialize(A<CacheUpdateNotificationArgs>.Ignored)).Returns(new byte[] { 1 });
 
-            var publisher = new RedisPublisher(connection, serializer);
+            publisher = new RedisPublisher(_connection, _serializer);
+        }
 
+        [Fact]
+        public void PublishUpdate_SerializerCalled()
+        {
             publisher.NotifyUpdate("A", "B");
 
-            A.CallTo(() => serializer.Serialize(
+            A.CallTo(() => _serializer.Serialize(
                     A<CacheUpdateNotificationArgs>.That.Matches(args => args.Key == "A" && args.Type == "B" && args.ClientName == "C")))
                 .MustHaveHappened(Repeated.Exactly.Once);
         }
-        
+
         [Fact]
-        public void Publish_PublishCalled()
+        public void PublishDelete_SerializerCalled()
         {
-            var connection = A.Fake<IConnectionMultiplexer>();
-            var serializer = A.Fake<IItemSerializer>();
-            var subscriber = A.Fake<ISubscriber>();
+            publisher.NotifyDelete("A");
 
-            A.CallTo(() => connection.GetSubscriber(null)).Returns(subscriber);
-            A.CallTo(() => connection.ClientName).Returns("C");
-            A.CallTo(() => serializer.Serialize(A<CacheUpdateNotificationArgs>.Ignored)).Returns(new byte[] { 1 });
-            var publisher = new RedisPublisher(connection, serializer);
-
-            publisher.NotifyUpdate("A", "B");
-
-            A.CallTo(() => subscriber.Publish("cacheUpdate", A<RedisValue>.That.Matches(r => ((byte[])r)[0] == 1), CommandFlags.FireAndForget))
+            A.CallTo(() => _serializer.Serialize(
+                    A<CacheUpdateNotificationArgs>.That.Matches(args => args.Key == "A" && args.ClientName == "C")))
                 .MustHaveHappened(Repeated.Exactly.Once);
         }
 
         [Fact]
-        public void Publish_WithTimeToLive_PublishCalled()
+        public void PublishUpdate_PublishCalled()
         {
-            var connection = A.Fake<IConnectionMultiplexer>();
-            var serializer = A.Fake<IItemSerializer>();
-            var subscriber = A.Fake<ISubscriber>();
+            publisher.NotifyUpdate("A", "B");
 
-            A.CallTo(() => connection.GetSubscriber(null)).Returns(subscriber);
-            A.CallTo(() => connection.ClientName).Returns("C");
-            A.CallTo(() => serializer.Serialize(A<CacheUpdateNotificationArgs>.Ignored)).Returns(new byte[] { 1 });
-            var publisher = new RedisPublisher(connection, serializer);
+            A.CallTo(() => _subscriber.Publish("cacheUpdate", A<RedisValue>.That.Matches(r => ((byte[])r)[0] == 1), CommandFlags.FireAndForget))
+                .MustHaveHappened(Repeated.Exactly.Once);
+        }
 
+        [Fact]
+        public void PublishUpdate_WithTimeToLive_PublishCalled()
+        {
             publisher.NotifyUpdate("A", "B", TimeSpan.FromMilliseconds(1));
 
-            A.CallTo(() => subscriber.Publish("cacheUpdate", A<RedisValue>.That.Matches(r => ((byte[])r)[0] == 1), CommandFlags.FireAndForget))
+            A.CallTo(() => _subscriber.Publish("cacheUpdate", A<RedisValue>.That.Matches(r => ((byte[])r)[0] == 1), CommandFlags.FireAndForget))
                 .MustHaveHappened(Repeated.Exactly.Once);
+        }
+
+        [Fact]
+        public void PublishDelete_PublishCalled()
+        {
+            publisher.NotifyDelete("A");
+
+            A.CallTo(() => _subscriber.Publish("cacheDelete", A<RedisValue>.That.Matches(r => ((byte[])r)[0] == 1), CommandFlags.FireAndForget));
         }
     }
 }

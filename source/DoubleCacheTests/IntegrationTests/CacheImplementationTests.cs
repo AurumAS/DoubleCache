@@ -129,5 +129,20 @@ namespace DoubleCacheTests.IntegrationTests
             result.ShouldBe("A");
         }
 
+        [Fact]
+        public async Task Remove_ExistingKey_DeletesValue()
+        {
+            var func = A.Fake<Func<Task<string>>>();
+            A.CallTo(() => func.Invoke()).Returns("B");
+
+            _cacheImplementation.Add(_key, "A");
+
+            _cacheImplementation.Remove(_key);
+
+            var result = await _cacheImplementation.GetAsync(_key, func);
+
+            A.CallTo(() => func.Invoke()).MustHaveHappened(Repeated.Exactly.Once);
+            result.ShouldBe("B");
+        }
     }
 }

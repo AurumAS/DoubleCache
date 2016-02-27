@@ -6,5 +6,6 @@ namespace DoubleCache
     {
         void NotifyUpdate(string key, string type);
         void NotifyUpdate(string key, string type, TimeSpan? specificTimeToLive);
+        void NotifyDelete(string key);
     }
 }

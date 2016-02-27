@@ -8,5 +8,6 @@ namespace CacheSample
     {
         Task<IHttpActionResult> GetSingle();
         Task<IHttpActionResult> GetMany();
+        IHttpActionResult Remove();
     }
 }

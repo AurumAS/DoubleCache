@@ -1,9 +1,6 @@
 ﻿using DoubleCache;
 using FakeItEasy;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -169,6 +166,22 @@ namespace DoubleCacheTests
 
             A.CallTo(() => fakeAction.Invoke()).MustHaveHappened(Repeated.Exactly.Once);
             A.CallTo(() => _publisher.NotifyUpdate("a", typeof(string).AssemblyQualifiedName, TimeSpan.FromSeconds(1))).MustHaveHappened(Repeated.Exactly.Once);
+        }
+
+        [Fact]
+        public void Remove_DecoratedCache_Called()
+        {
+            _publishingCache.Remove("a");
+
+            A.CallTo(() => _decoratedCache.Remove("a")).MustHaveHappened(Repeated.Exactly.Once);
+        }
+
+        [Fact]
+        public void Remove_Publisher_Called()
+        {
+            _publishingCache.Remove("a");
+
+            A.CallTo(() => _publisher.NotifyDelete("a")).MustHaveHappened(Repeated.Exactly.Once);
         }
     }
 }
