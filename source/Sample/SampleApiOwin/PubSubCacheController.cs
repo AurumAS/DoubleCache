@@ -1,14 +1,11 @@
 ﻿using DoubleCache;
-using DoubleCache.Redis;
 using DoubleCache.Serialization;
 using RandomUser;
 using StackExchange.Redis;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Net.Http;
+using System.Net;
 
 namespace CacheSample
 {
@@ -23,7 +20,7 @@ namespace CacheSample
             var connection = ConnectionMultiplexer.Connect("localhost");
             var serializer = new MsgPackItemSerializer();
 
-            _pubSubCache = DoubleCache.CacheFactory.CreatePubSubDoubleCache(connection, serializer);
+            _pubSubCache = CacheFactory.CreatePubSubDoubleCache(connection, serializer);
         }
         public PubSubCacheController()
         {
@@ -40,6 +37,16 @@ namespace CacheSample
         public async Task<IHttpActionResult> GetMany()
         {
             return Ok(await _pubSubCache.GetAsync(Request.RequestUri.PathAndQuery, () => _repo.GetManyDummyUser(2000)));
+        }
+
+        [HttpDelete]
+        [Route("single")]
+        [Route("many")]
+        public IHttpActionResult Remove()
+        {
+            _pubSubCache.Remove(Request.RequestUri.PathAndQuery);
+
+            return ResponseMessage(new HttpResponseMessage(HttpStatusCode.NoContent));
         }
     }
 }

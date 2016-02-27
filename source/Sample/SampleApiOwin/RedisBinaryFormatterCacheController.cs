@@ -5,6 +5,8 @@ using RandomUser;
 using StackExchange.Redis;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Net.Http;
+using System.Net;
 
 namespace CacheSample
 {
@@ -34,6 +36,16 @@ namespace CacheSample
         public async Task<IHttpActionResult> GetMany()
         {
             return Ok(await _redisCache.GetAsync(Request.RequestUri.PathAndQuery, () => _repo.GetManyDummyUser(2000)));
+        }
+
+        [HttpDelete]
+        [Route("single")]
+        [Route("many")]
+        public IHttpActionResult Remove()
+        {
+            _redisCache.Remove(Request.RequestUri.PathAndQuery);
+
+            return ResponseMessage(new HttpResponseMessage(HttpStatusCode.NoContent));
         }
     }
 }
