@@ -99,5 +99,15 @@ namespace DoubleCacheTests
             A.CallTo(() => _decoratedCache.Add<object>("a", "b", TimeSpan.FromMinutes(1)))
                 .MustHaveHappened(Repeated.Exactly.Once);
         }
+
+        [Fact]
+        public async Task SubscriberDelete_ItemDelete()
+        {
+            _subscriber.CacheDelete += Raise.With(this, new CacheUpdateNotificationArgs { Key = "a" });
+
+            await Task.Delay(TimeSpan.FromSeconds(1));
+            A.CallTo(() => _decoratedCache.Remove("a"))
+                .MustHaveHappened(Repeated.Exactly.Once);
+        }
     }
 }

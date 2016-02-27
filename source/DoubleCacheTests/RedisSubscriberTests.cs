@@ -38,6 +38,17 @@ namespace DoubleCacheTests
         }
 
         [Fact]
+        public void Constructor_SubscribesToCacheDeleteChannel_WithItself()
+        {
+            var cacheSubscriber = new RedisSubscriber(_connection, _remoteCache, _itemSerializer);
+
+            A.CallTo(() => _subscriber.Subscribe(
+                "cacheDelete",
+                A<Action<RedisChannel, RedisValue>>.That.Matches(f => f.Target.Equals(cacheSubscriber)),
+                A<CommandFlags>._)).MustHaveHappened(Repeated.Exactly.Once);
+        }
+
+        [Fact]
         public void GetAsync_CallsRemoteCache()
         {
             var cacheSubscriber = new RedisSubscriber(_connection, _remoteCache, _itemSerializer);
@@ -47,13 +58,15 @@ namespace DoubleCacheTests
             A.CallTo(() => _remoteCache.GetAsync("A", typeof(string), A<Func<Task<object>>>._)).MustHaveHappened(Repeated.Exactly.Once);
         }
 
-        [Fact]
-        public void OnMessage_EventTriggered()
+        [Theory]
+        [InlineData("cacheUpdate")]
+        [InlineData("cacheDelete")]
+        public void OnMessage_EventTriggered(string channelName)
         {
             Action<RedisChannel, RedisValue> method = null;
 
             A.CallTo(() => _subscriber.Subscribe(
-                         "cacheUpdate",
+                         channelName,
                          A<Action<RedisChannel, RedisValue>>._,
                          A<CommandFlags>._)).Invokes(i => method = i.GetArgument<Action<RedisChannel, RedisValue>>(1));
 
@@ -62,20 +75,25 @@ namespace DoubleCacheTests
             A.CallTo(() => _itemSerializer.Deserialize<CacheUpdateNotificationArgs>(A<byte[]>._)).Returns(new CacheUpdateNotificationArgs() { ClientName ="A" });
 
             var cacheSubscriber = new RedisSubscriber(_connection, _remoteCache, _itemSerializer);
+
             cacheSubscriber.CacheUpdate += eventHandler;
-            method.Invoke("cacheUpdate","a");
+            cacheSubscriber.CacheDelete += eventHandler;
+
+            method.Invoke(channelName,"a");
 
             A.CallTo(() => eventHandler(A<object>.Ignored, A<CacheUpdateNotificationArgs>._)).MustHaveHappened(Repeated.Exactly.Once);
         }
 
-        [Fact]
-        public void OnMessage_SameClientName_EventNotTriggered_()
+        [Theory]
+        [InlineData("cacheUpdate")]
+        [InlineData("cacheDelete")]
+        public void OnMessage_SameClientName_EventNotTriggered_(string channelName)
         {
             Action<RedisChannel, RedisValue> method = null;
 
             A.CallTo(() => _connection.ClientName).Returns("A");
             A.CallTo(() => _subscriber.Subscribe(
-                         "cacheUpdate",
+                         channelName,
                          A<Action<RedisChannel, RedisValue>>._,
                          A<CommandFlags>._)).Invokes(i => method = i.GetArgument<Action<RedisChannel, RedisValue>>(1));
 
@@ -84,8 +102,11 @@ namespace DoubleCacheTests
             A.CallTo(() => _itemSerializer.Deserialize<CacheUpdateNotificationArgs>(A<byte[]>._)).Returns(new CacheUpdateNotificationArgs() { ClientName = "A" });
 
             var cacheSubscriber = new RedisSubscriber(_connection, _remoteCache, _itemSerializer);
+
             cacheSubscriber.CacheUpdate += eventHandler;
-            method.Invoke("cacheUpdate", "a");
+            cacheSubscriber.CacheDelete += eventHandler;
+
+            method.Invoke(channelName, "a");
 
             A.CallTo(() => eventHandler(A<object>.Ignored, A<CacheUpdateNotificationArgs>._)).MustNotHaveHappened();
         }
