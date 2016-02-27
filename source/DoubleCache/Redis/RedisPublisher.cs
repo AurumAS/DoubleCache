@@ -38,5 +38,16 @@ namespace DoubleCache.Redis
                  data,
                  CommandFlags.FireAndForget);
         }
+
+        public void NotifyDelete(string key)
+        {
+            var data = _itemSerializer.Serialize(new CacheUpdateNotificationArgs { 
+                Key = key,
+                ClientName = _connection.ClientName});
+            _connection.GetSubscriber().Publish(
+                "cacheDelete",
+                data,
+                CommandFlags.FireAndForget);
+        }
     }
 }

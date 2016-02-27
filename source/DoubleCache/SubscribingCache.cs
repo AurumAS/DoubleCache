@@ -17,6 +17,7 @@ namespace DoubleCache
             _cacheSubscriber = cacheSubscriber;
 
             _cacheSubscriber.CacheUpdate += OnCacheUpdate;
+            _cacheSubscriber.CacheDelete += OnCacheDelete;
         }
 
         public void Add<T>(string key, T item)
@@ -61,6 +62,16 @@ namespace DoubleCache
                 Add(e.Key, remoteItem,e.SpecificTimeToLive._timeToLive);
             else
                 Add(e.Key, remoteItem);
+        }
+
+        private void OnCacheDelete(object sender, CacheUpdateNotificationArgs e)
+        {
+            Remove(e.Key);
+        }
+
+        public void Remove(string key)
+        {
+            _cache.Remove(key);
         }
     }
 }

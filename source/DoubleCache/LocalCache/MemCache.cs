@@ -75,5 +75,10 @@ namespace DoubleCache.LocalCache
             }
             return item;
         }
+
+        public void Remove(string key)
+        {
+            MemoryCache.Default.Remove(key);
+        }
     }
 }

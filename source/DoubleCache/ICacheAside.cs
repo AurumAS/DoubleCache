@@ -13,5 +13,7 @@ namespace DoubleCache
 
         Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever);
         Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever, TimeSpan? timeToLive);
+
+        void Remove(string key);
     }
 }

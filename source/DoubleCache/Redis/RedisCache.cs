@@ -91,5 +91,10 @@ namespace DoubleCache.Redis
             Add(key, item, timeToLive);
             return item;
         }
+
+        public void Remove(string key)
+        {
+            _database.KeyDelete(key);
+        }
     }
 }

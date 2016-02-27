@@ -67,5 +67,11 @@ namespace DoubleCache
                 return result;
             }, timeToLive);
         }
+
+        public void Remove(string key)
+        {
+            _cache.Remove(key);
+            _cachePublisher.NotifyDelete(key);
+        }
     }
 }
