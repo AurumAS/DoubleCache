@@ -12,7 +12,7 @@ let nugetDir = "./nuget"
 let references  = !! "source/DoubleCache/*.csproj"
 let testReferences = !! "source/DoubleCacheTests/*.csproj"    
 
-let version = "1.1.1"
+let version = "1.2.0"
 let commitHash = Information.getCurrentSHA1(".")
 
 let projectName = "DoubleCache"
@@ -70,7 +70,7 @@ Target "CreateNuget" (fun _ ->
                             "MsgPack.Cli", "0.6.5"
             ]
             Files = [
-                    (@"DoubleCache.*", Some @"lib\net46", None)
+                    (@"DoubleCache.*", Some @"lib\net45", None)
             ]
         }) 
         "DoubleCache.nuspec"
