@@ -66,11 +66,11 @@ Target "CreateNuget" (fun _ ->
             Version = version
             Publish = false
             Dependencies = [
-                "StackExchange.Redis", "1.0"
-                "MsgPack.Cli", "0.6.5"
+                            "StackExchange.Redis", "1.0"
+                            "MsgPack.Cli", "0.6.5"
             ]
             Files = [
-                (@"DoubleCache.*", Some @"lib\net46", None)
+                    (@"DoubleCache.*", Some @"lib\net46", None)
             ]
         }) 
         "DoubleCache.nuspec"

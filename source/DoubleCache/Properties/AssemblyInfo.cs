@@ -6,12 +6,12 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescriptionAttribute("Layered distributed cache-aside implementation")]
 [assembly: GuidAttribute("505f87a8-3062-4070-af1f-cd7358ccd06a")]
 [assembly: AssemblyProductAttribute("DoubleCache")]
-[assembly: AssemblyVersionAttribute("0.2.1")]
-[assembly: AssemblyInformationalVersionAttribute("0.2.1")]
-[assembly: AssemblyFileVersionAttribute("0.2.1")]
-[assembly: AssemblyMetadataAttribute("githash","ecb3d422c0c6ab6212960f4ea0a403beefec6de2")]
+[assembly: AssemblyVersionAttribute("1.1.1")]
+[assembly: AssemblyInformationalVersionAttribute("1.1.1")]
+[assembly: AssemblyFileVersionAttribute("1.1.1")]
+[assembly: AssemblyMetadataAttribute("githash","f03b5c93ea779bb44bdbe4cc77ea60fb10e1f864")]
 namespace System {
     internal static class AssemblyVersionInformation {
-        internal const string Version = "0.2.1";
+        internal const string Version = "1.1.1";
     }
 }
