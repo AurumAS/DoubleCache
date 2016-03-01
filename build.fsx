@@ -70,7 +70,7 @@ Target "CreateNuget" (fun _ ->
                 "MsgPack.Cli", "0.6.5"
             ]
             Files = [
-                (@"DoubleCache.*", None, None)
+                (@"DoubleCache.*", Some @"lib\net46", None)
             ]
         }) 
         "DoubleCache.nuspec"
