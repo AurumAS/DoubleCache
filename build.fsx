@@ -66,7 +66,7 @@ Target "CreateNuget" (fun _ ->
             Version = version
             Publish = false
             Dependencies = [
-                            "StackExchange.Redis", "1.0"
+                            "StackExchange.Redis", "1.0.488"
                             "MsgPack.Cli", "0.6.5"
             ]
             Files = [
