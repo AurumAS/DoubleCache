@@ -12,7 +12,7 @@ let nugetDir = "./nuget"
 let references  = !! "source/DoubleCache/*.csproj"
 let testReferences = !! "source/DoubleCacheTests/*.csproj"    
 
-let version = "1.2.0"
+let version = "1.2.1"
 let commitHash = Information.getCurrentSHA1(".")
 
 let projectName = "DoubleCache"
@@ -66,7 +66,7 @@ Target "CreateNuget" (fun _ ->
             Version = version
             Publish = false
             Dependencies = [
-                            "StackExchange.Redis", "1.0"
+                            "StackExchange.Redis", "1.0.488"
                             "MsgPack.Cli", "0.6.5"
             ]
             Files = [
