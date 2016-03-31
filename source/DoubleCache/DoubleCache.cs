@@ -5,8 +5,8 @@ namespace DoubleCache
 {
     public class DoubleCache : ICacheAside 
     {
-        private ICacheAside _localCache;
-        private ICacheAside _remoteCache;
+        private readonly ICacheAside _localCache;
+        private readonly ICacheAside _remoteCache;
            
         public DoubleCache(ICacheAside localCache,ICacheAside remoteCache)
         {
@@ -24,6 +24,27 @@ namespace DoubleCache
         {
             _localCache.Add(key, item, timeToLive);
             _remoteCache.Add(key, item, timeToLive);
+        }
+
+        public T Get<T>(string key, Func<T> dataRetriever) where T : class
+        {
+            return _localCache.Get(key, () => _remoteCache.Get(key, dataRetriever));
+        }
+
+        public T Get<T>(string key, Func<T> dataRetriever, TimeSpan? timeToLive) where T : class
+        {
+            return _localCache.Get(key, () => _remoteCache.Get(key, dataRetriever, timeToLive), timeToLive);
+
+        }
+
+        public object Get(string key, Type type, Func<object> dataRetriever)
+        {
+            return _localCache.Get(key, type, () => _remoteCache.Get(key, type, dataRetriever));
+        }
+
+        public object Get(string key, Type type, Func<object> dataRetriever, TimeSpan? timeToLive)
+        {
+            return _localCache.Get(key, type, () => _remoteCache.Get(key, type, dataRetriever, timeToLive), timeToLive);
         }
 
         public Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever)

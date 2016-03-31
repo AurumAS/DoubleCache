@@ -14,6 +14,112 @@ namespace DoubleCacheTests.IntegrationTests
 
 
         [Fact]
+        public void Get_ExistingValue_ReturnsValue()
+        {
+            _cacheImplementation.Add(_key, "A");
+
+            var result = _cacheImplementation.Get<string>(_key, null);
+
+            result.ShouldBe("A");
+        }
+
+        [Fact]
+        public void Get_WithTimeToLive_ExistingValue_ReturnsValue()
+        {
+            _cacheImplementation.Add(_key, "A");
+
+            var result = _cacheImplementation.Get<string>(_key, null, TimeSpan.FromSeconds(1));
+
+            result.ShouldBe("A");
+        }
+
+        [Fact]
+        public void GetGeneric_NoValue_CallsMethod()
+        {
+            var func = A.Fake<Func<string>>();
+
+            _cacheImplementation.Get(_key, func);
+
+            A.CallTo(() => func.Invoke()).MustHaveHappened(Repeated.Exactly.Once);
+        }
+
+        [Fact]
+        public void GetGeneric_WithTimeToLive_NoValue_CallsMethod()
+        {
+            var func = A.Fake<Func<string>>();
+
+            _cacheImplementation.Get(_key, func, TimeSpan.FromSeconds(1));
+
+            A.CallTo(() => func.Invoke()).MustHaveHappened(Repeated.Exactly.Once);
+        }
+
+        [Fact]
+        public void GetGeneric_NoValue_CachePopulated()
+        {
+            var func = A.Fake<Func<string>>();
+
+            A.CallTo(() => func.Invoke()).Returns("A");
+
+            var result = _cacheImplementation.Get(_key, func);
+
+            result.ShouldBe("A");
+        }
+
+        [Fact]
+        public void GetUntyped_ExistingValue_ReturnsValue()
+        {
+            _cacheImplementation.Add(_key, "A");
+
+            var result = _cacheImplementation.Get(_key, typeof(string), null);
+
+            result.ShouldBe("A");
+        }
+
+        [Fact]
+        public void GetUntyped_WithTimeToLive_ExistingValue_ReturnsValue()
+        {
+            _cacheImplementation.Add(_key, "A");
+
+            var result = _cacheImplementation.Get(_key, typeof(string), null, TimeSpan.FromSeconds(1));
+
+            result.ShouldBe("A");
+        }
+
+        [Fact]
+        public void GetUntyped_NoValue_CallsMethod()
+        {
+            var func = A.Fake<Func<object>>();
+
+            _cacheImplementation.Get(_key, typeof(string), func);
+
+            A.CallTo(() => func.Invoke()).MustHaveHappened(Repeated.Exactly.Once);
+        }
+
+        [Fact]
+        public void GetUntyped_NoValue_CachePopulated()
+        {
+            var func = A.Fake<Func<object>>();
+
+            A.CallTo(() => func.Invoke()).Returns("A");
+
+            var result = _cacheImplementation.Get(_key, typeof(string), func);
+
+            result.ShouldBe("A");
+        }
+
+        [Fact]
+        public void GetUntyped_WithTimeToLive_NoValue_CachePopulated()
+        {
+            var func = A.Fake<Func<object>>();
+
+            A.CallTo(() => func.Invoke()).Returns("A");
+
+            var result = _cacheImplementation.Get(_key, typeof(string), func, TimeSpan.FromSeconds(1));
+
+            result.ShouldBe("A");
+        }
+
+        [Fact]
         public async Task GetAsync_ExistingValue_ReturnsValue()
         {
             _cacheImplementation.Add(_key, "A");
@@ -38,7 +144,7 @@ namespace DoubleCacheTests.IntegrationTests
         {
             var func = A.Fake<Func<Task<string>>>();
 
-            var result = await _cacheImplementation.GetAsync(_key, func);
+            await _cacheImplementation.GetAsync(_key, func);
 
             A.CallTo(() => func.Invoke()).MustHaveHappened(Repeated.Exactly.Once);
         }
@@ -48,7 +154,7 @@ namespace DoubleCacheTests.IntegrationTests
         {
             var func = A.Fake<Func<Task<string>>>();
 
-            var result = await _cacheImplementation.GetAsync(_key, func, TimeSpan.FromSeconds(1));
+            await _cacheImplementation.GetAsync(_key, func, TimeSpan.FromSeconds(1));
 
             A.CallTo(() => func.Invoke()).MustHaveHappened(Repeated.Exactly.Once);
         }
@@ -90,7 +196,7 @@ namespace DoubleCacheTests.IntegrationTests
         {
             var func = A.Fake<Func<Task<object>>>();
 
-            var result = await _cacheImplementation.GetAsync(_key, typeof(string), func);
+            await _cacheImplementation.GetAsync(_key, typeof(string), func);
 
             A.CallTo(() => func.Invoke()).MustHaveHappened(Repeated.Exactly.Once);
         }
