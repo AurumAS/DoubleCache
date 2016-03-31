@@ -5,8 +5,8 @@ namespace DoubleCache
 {
     public class PublishingCache : ICacheAside
     {
-        private ICacheAside _cache;
-        private ICachePublisher _cachePublisher;
+        private readonly ICacheAside _cache;
+        private readonly ICachePublisher _cachePublisher;
 
         public PublishingCache(ICacheAside cache, ICachePublisher cachePublisher)
         {
@@ -16,14 +16,50 @@ namespace DoubleCache
 
         public void Add<T>(string key, T item)
         {
-            _cache.Add<T>(key, item);
+            _cache.Add(key, item);
             _cachePublisher.NotifyUpdate(key, item.GetType().AssemblyQualifiedName);
         }
 
         public void Add<T>(string key, T item, TimeSpan? timeToLive)
         {
-            _cache.Add<T>(key, item, timeToLive);
+            _cache.Add(key, item, timeToLive);
             _cachePublisher.NotifyUpdate(key, item.GetType().AssemblyQualifiedName);
+        }
+
+        public T Get<T>(string key, Func<T> dataRetriever) where T : class
+        {
+            return _cache.Get(key, () => {
+                var result = dataRetriever.Invoke();
+                _cachePublisher.NotifyUpdate(key, result.GetType().AssemblyQualifiedName);
+                return result;
+            });
+        }
+
+        public T Get<T>(string key, Func<T> dataRetriever, TimeSpan? timeToLive) where T : class
+        {
+            return _cache.Get(key, () => {
+                var result = dataRetriever.Invoke();
+                _cachePublisher.NotifyUpdate(key, result.GetType().AssemblyQualifiedName, timeToLive);
+                return result;
+            }, timeToLive);
+        }
+
+        public object Get(string key, Type type, Func<object> dataRetriever)
+        {
+            return _cache.Get(key, type, () => {
+                var result = dataRetriever.Invoke();
+                _cachePublisher.NotifyUpdate(key, result.GetType().AssemblyQualifiedName);
+                return result;
+            });
+        }
+
+        public object Get(string key, Type type, Func<object> dataRetriever, TimeSpan? timeToLive)
+        {
+            return _cache.Get(key, type, () => {
+                var result = dataRetriever.Invoke();
+                _cachePublisher.NotifyUpdate(key, result.GetType().AssemblyQualifiedName, timeToLive);
+                return result;
+            }, timeToLive);
         }
 
         public Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever)

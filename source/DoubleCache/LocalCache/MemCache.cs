@@ -6,7 +6,7 @@ namespace DoubleCache.LocalCache
 {
     public class MemCache : ICacheAside
     {
-        TimeSpan? _defaultTtl;
+        private readonly TimeSpan? _defaultTtl;
 
         public MemCache(TimeSpan? defaultTtl = null)
         {
@@ -30,15 +30,42 @@ namespace DoubleCache.LocalCache
             MemoryCache.Default.Set(key, item, policy);
         }
 
-        public async Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever)
+        public T Get<T>(string key, Func<T> dataRetriever) where T : class
+        {
+            return Get(key, dataRetriever, _defaultTtl);
+        }
+
+        public T Get<T>(string key, Func<T> dataRetriever, TimeSpan? timeToLive) where T : class
+        {
+            var item = MemoryCache.Default.Get(key) as T;
+            if (item != null)
+                return item;
+            {
+                item = dataRetriever.Invoke();
+                Add(key, item, timeToLive);
+            }
+            return item;
+        }
+
+        public object Get(string key, Type type, Func<object> dataRetriever)
+        {
+            return Get(key, type, dataRetriever, _defaultTtl);
+        }
+
+        public object Get(string key, Type type, Func<object> dataRetriever, TimeSpan? timeToLive)
         {
             var item = MemoryCache.Default.Get(key);
             if (item != null && item.GetType() == type)
                 return item;
 
-            item = await dataRetriever.Invoke();
-            Add(key, item);
+            item = dataRetriever.Invoke();
+            Add(key, item, timeToLive);
             return item.GetType() == type ? item : null;
+        }
+
+        public async Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever)
+        {
+            return await GetAsync(key, type, dataRetriever, _defaultTtl);
         }
 
         public async Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever, TimeSpan? timeToLive)
@@ -54,14 +81,7 @@ namespace DoubleCache.LocalCache
 
         public async Task<T> GetAsync<T>(string key, Func<Task<T>> dataRetriever) where T : class
         {
-            var item = MemoryCache.Default.Get(key) as T;
-            if (item != null)
-                return item;
-            {
-                item = await dataRetriever.Invoke();
-                Add(key, item);
-            }
-            return item;
+            return await GetAsync(key, dataRetriever, _defaultTtl);
         }
 
         public async Task<T> GetAsync<T>(string key, Func<Task<T>> dataRetriever, TimeSpan? timeToLive) where T : class
