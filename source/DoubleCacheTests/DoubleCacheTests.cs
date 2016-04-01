@@ -8,10 +8,10 @@ namespace DoubleCacheTests
 {
     public class DoubleCacheTests
     {
-        ICacheAside _local;
-        ICacheAside _remote;
+        private readonly ICacheAside _local;
+        private readonly ICacheAside _remote;
 
-        DoubleCache.DoubleCache _doubleCache;
+        private readonly DoubleCache.DoubleCache _doubleCache;
 
         public DoubleCacheTests()
         {
@@ -43,6 +43,42 @@ namespace DoubleCacheTests
         }
 
         [Fact]
+        public void Get_CalledOnLocal()
+        {
+            _doubleCache.Get("A", typeof(string), null);
+
+            A.CallTo(() => _local.Get("A", A<Type>.Ignored, A<Func<object>>.Ignored)).MustHaveHappened(Repeated.Exactly.Once);
+            A.CallTo(() => _remote.Get("A", A<Type>.Ignored, A<Func<object>>.Ignored)).MustNotHaveHappened();
+        }
+
+        [Fact]
+        public void Get_WithTimeToLive_CalledOnLocal()
+        {
+            _doubleCache.Get("A", typeof(string), null, TimeSpan.FromSeconds(1));
+
+            A.CallTo(() => _local.Get("A", A<Type>.Ignored, A<Func<object>>.Ignored, TimeSpan.FromSeconds(1))).MustHaveHappened(Repeated.Exactly.Once);
+            A.CallTo(() => _remote.Get("A", A<Type>.Ignored, A<Func<object>>.Ignored, TimeSpan.FromSeconds(1))).MustNotHaveHappened();
+        }
+
+        [Fact]
+        public void GetGeneric_CalledOnLocal()
+        {
+            _doubleCache.Get<string>("A", null);
+
+            A.CallTo(() => _local.Get("A", A<Func<string>>.Ignored)).MustHaveHappened(Repeated.Exactly.Once);
+            A.CallTo(() => _remote.Get("A", A<Func<string>>.Ignored)).MustNotHaveHappened();
+        }
+
+        [Fact]
+        public void GetGeneric_WithTimeToLive_CalledOnLocal()
+        {
+            _doubleCache.Get<string>("A", null, TimeSpan.FromSeconds(1));
+
+            A.CallTo(() => _local.Get("A", A<Func<string>>.Ignored, TimeSpan.FromSeconds(1))).MustHaveHappened(Repeated.Exactly.Once);
+            A.CallTo(() => _remote.Get("A", A<Func<string>>.Ignored)).MustNotHaveHappened();
+        }
+
+        [Fact]
         public async Task GetAsync_CalledOnLocal()
         {
             await _doubleCache.GetAsync("A", typeof(string), null);
@@ -65,8 +101,8 @@ namespace DoubleCacheTests
         {
             await _doubleCache.GetAsync<string>("A", null);
 
-            A.CallTo(() => _local.GetAsync<string>("A",  A<Func<Task<string>>>.Ignored)).MustHaveHappened(Repeated.Exactly.Once);
-            A.CallTo(() => _remote.GetAsync<string>("A", A<Func<Task<string>>>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => _local.GetAsync("A",  A<Func<Task<string>>>.Ignored)).MustHaveHappened(Repeated.Exactly.Once);
+            A.CallTo(() => _remote.GetAsync("A", A<Func<Task<string>>>.Ignored)).MustNotHaveHappened();
         }
 
         [Fact]
@@ -74,8 +110,8 @@ namespace DoubleCacheTests
         {
             await _doubleCache.GetAsync<string>("A", null, TimeSpan.FromSeconds(1));
 
-            A.CallTo(() => _local.GetAsync<string>("A", A<Func<Task<string>>>.Ignored, TimeSpan.FromSeconds(1))).MustHaveHappened(Repeated.Exactly.Once);
-            A.CallTo(() => _remote.GetAsync<string>("A", A<Func<Task<string>>>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => _local.GetAsync("A", A<Func<Task<string>>>.Ignored, TimeSpan.FromSeconds(1))).MustHaveHappened(Repeated.Exactly.Once);
+            A.CallTo(() => _remote.GetAsync("A", A<Func<Task<string>>>.Ignored)).MustNotHaveHappened();
         }
 
         [Fact]

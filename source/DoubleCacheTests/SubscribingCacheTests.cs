@@ -8,9 +8,9 @@ namespace DoubleCacheTests
 {
     public class SubscribingCacheTests
     {
-        ICacheAside _decoratedCache;
-        ICacheSubscriber _subscriber;
-        ICacheAside _subscribingCache;
+        private readonly ICacheAside _decoratedCache;
+        private readonly ICacheSubscriber _subscriber;
+        private readonly ICacheAside _subscribingCache;
 
         public SubscribingCacheTests()
         {
@@ -36,6 +36,38 @@ namespace DoubleCacheTests
         }
 
         [Fact]
+        public void Get_CallsThrough()
+        {
+            _subscribingCache.Get("a", typeof(string), null);
+            A.CallTo(() => _decoratedCache.Get("a", typeof(string), A<Func<object>>._))
+                .MustHaveHappened(Repeated.Exactly.Once);
+        }
+
+        [Fact]
+        public void Get_WithTimeToLive_CallsThrough()
+        {
+            _subscribingCache.Get("a", typeof(string), null, TimeSpan.FromSeconds(1));
+            A.CallTo(() => _decoratedCache.Get("a", typeof(string), A<Func<object>>._, TimeSpan.FromSeconds(1)))
+                .MustHaveHappened(Repeated.Exactly.Once);
+        }
+
+        [Fact]
+        public void GetGeneric_CallsThrough()
+        {
+            _subscribingCache.Get("a", A.Fake<Func<string>>());
+            A.CallTo(() => _decoratedCache.Get("a", A<Func<string>>._))
+                .MustHaveHappened(Repeated.Exactly.Once);
+        }
+
+        [Fact]
+        public void GetGeneric_WithTimeToLive_CallsThrough()
+        {
+            _subscribingCache.Get("a", A.Fake<Func<string>>(), TimeSpan.FromSeconds(1));
+            A.CallTo(() => _decoratedCache.Get("a", A<Func<string>>._, TimeSpan.FromSeconds(1)))
+                .MustHaveHappened(Repeated.Exactly.Once);
+        }
+
+        [Fact]
         public async Task GetAsync_CallsThrough()
         {
             await _subscribingCache.GetAsync("a", typeof(string), null);
@@ -58,7 +90,7 @@ namespace DoubleCacheTests
             A.CallTo(() => _decoratedCache.GetAsync("a", A<Func<Task<string>>>._))
                 .MustHaveHappened(Repeated.Exactly.Once);
         }
-
+        
         [Fact]
         public async Task GetAsyncGeneric_WithTimeToLive_CallsThrough()
         {
