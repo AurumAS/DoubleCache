@@ -11,14 +11,14 @@ namespace DoubleCacheTests.IntegrationTests
     public class CacheFactoryTests
     {
         [Fact]
-        public void CreatesSyncedCache_ReturnsCacheObject()
+        public void CreatePubSubDoubleCache_ReturnsCacheObject()
         {
             var connection = A.Fake<IConnectionMultiplexer>();
             var serializer = A.Fake<IItemSerializer>();
 
-            var cache1 = CacheFactory.CreatePubSubDoubleCache(connection, serializer);
+            var cache = CacheFactory.CreatePubSubDoubleCache(connection, serializer);
 
-            cache1.ShouldBeOfType<DoubleCache.DoubleCache>();
+            cache.ShouldBeOfType<DoubleCache.DoubleCache>();
         }
     }
 }

@@ -6,9 +6,9 @@ namespace DoubleCache
 {
     public class SubscribingCache : ICacheAside
     {
-        private ICacheAside _cache;
-        private ICacheSubscriber _cacheSubscriber;
-        private ConcurrentDictionary<string, Type> _knownTypes;
+        private readonly ICacheAside _cache;
+        private readonly ICacheSubscriber _cacheSubscriber;
+        private readonly ConcurrentDictionary<string, Type> _knownTypes;
 
         public SubscribingCache(ICacheAside cache, ICacheSubscriber cacheSubscriber)
         {
@@ -22,12 +22,32 @@ namespace DoubleCache
 
         public void Add<T>(string key, T item)
         {
-            _cache.Add<T>(key, item);
+            _cache.Add(key, item);
         }
 
         public void Add<T>(string key, T item, TimeSpan? timeToLive)
         {
-            _cache.Add<T>(key, item, timeToLive);
+            _cache.Add(key, item, timeToLive);
+        }
+
+        public T Get<T>(string key, Func<T> dataRetriever) where T : class
+        {
+            return _cache.Get(key, dataRetriever);
+        }
+
+        public T Get<T>(string key, Func<T> dataRetriever, TimeSpan? timeToLive) where T : class
+        {
+            return _cache.Get(key, dataRetriever, timeToLive);
+        }
+
+        public object Get(string key, Type type, Func<object> dataRetriever)
+        {
+            return _cache.Get(key, type, dataRetriever);
+        }
+
+        public object Get(string key, Type type, Func<object> dataRetriever, TimeSpan? timeToLive)
+        {
+            return _cache.Get(key, type, dataRetriever, timeToLive);
         }
 
         public Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever)
@@ -59,7 +79,7 @@ namespace DoubleCache
             var remoteItem = await _cacheSubscriber.GetAsync(e.Key, _knownTypes.GetOrAdd(e.Type, Type.GetType(e.Type)));
 
             if (e.SpecificTimeToLive != null)
-                Add(e.Key, remoteItem,e.SpecificTimeToLive._timeToLive);
+                Add(e.Key, remoteItem, e.SpecificTimeToLive._timeToLive);
             else
                 Add(e.Key, remoteItem);
         }
