@@ -5,6 +5,7 @@ using FakeItEasy;
 using StackExchange.Redis;
 using System;
 using System.Threading.Tasks;
+using Shouldly;
 using Xunit;
 
 namespace DoubleCacheTests
@@ -58,6 +59,19 @@ namespace DoubleCacheTests
             A.CallTo(() => _remoteCache.GetAsync("A", typeof(string), A<Func<Task<object>>>._)).MustHaveHappened(Repeated.Exactly.Once);
         }
 
+        [Fact]
+        public void GetAsync_CallingDataRetriever_DoesNotThrow()
+        {
+            var cacheSubscriber = new RedisSubscriber(_connection, _remoteCache, _itemSerializer);
+            A.CallTo(() => _remoteCache.GetAsync("A", typeof(string), A<Func<Task<object>>>._))
+                .Invokes(call => call.GetArgument<Func<Task<object>>>(2).Invoke());
+
+            Action act = () => cacheSubscriber.GetAsync("A", typeof(string));
+
+            act.ShouldNotThrow();
+        }
+
+
         [Theory]
         [InlineData("cacheUpdate")]
         [InlineData("cacheDelete")]
@@ -87,7 +101,7 @@ namespace DoubleCacheTests
         [Theory]
         [InlineData("cacheUpdate")]
         [InlineData("cacheDelete")]
-        public void OnMessage_SameClientName_EventNotTriggered_(string channelName)
+        public void OnMessage_SameClientName_EventNotTriggered(string channelName)
         {
             Action<RedisChannel, RedisValue> method = null;
 

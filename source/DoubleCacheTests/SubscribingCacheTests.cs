@@ -133,6 +133,17 @@ namespace DoubleCacheTests
         }
 
         [Fact]
+        public async Task SubscriberUpdater_NullReturned_DoesNotAddToCache()
+        {
+            A.CallTo(() => _subscriber.GetAsync("a", A<Type>.Ignored)).Returns(null);
+            _subscriber.CacheUpdate += Raise.With(this, new CacheUpdateNotificationArgs { Key = "a", Type = typeof(string).AssemblyQualifiedName, SpecificTimeToLive = new TimeToLive(TimeSpan.FromMinutes(1)) });
+
+            await Task.Delay(TimeSpan.FromSeconds(1));
+            A.CallTo(() => _decoratedCache.Add<object>("a", "b", TimeSpan.FromMinutes(1)))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
         public async Task SubscriberDelete_ItemDelete()
         {
             _subscriber.CacheDelete += Raise.With(this, new CacheUpdateNotificationArgs { Key = "a" });
