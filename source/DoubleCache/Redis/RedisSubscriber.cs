@@ -10,7 +10,6 @@ namespace DoubleCache.Redis
     {
         private ICacheAside _remoteCache;
         private IItemSerializer _itemSerializer;
-        private ConcurrentDictionary<string, Type> _knownTypes;
         private string _clientName;
 
         public event EventHandler<CacheUpdateNotificationArgs> CacheUpdate;
@@ -23,7 +22,6 @@ namespace DoubleCache.Redis
             _remoteCache = remoteCache;
             _itemSerializer = itemSerializer;
             _clientName = connection.ClientName;
-            _knownTypes = new ConcurrentDictionary<string, Type>();
         }
 
         private void CacheUpdated(RedisChannel channel, RedisValue message)
@@ -34,8 +32,7 @@ namespace DoubleCache.Redis
             if (updateNotification.ClientName.Equals(_clientName))
                 return;
 
-            if (CacheUpdate != null)
-                CacheUpdate(this, updateNotification);
+            CacheUpdate?.Invoke(this, updateNotification);
         }
 
         private void CacheDeleted(RedisChannel channel, RedisValue message)
@@ -45,13 +42,12 @@ namespace DoubleCache.Redis
             if (deleteNotification.ClientName.Equals(_clientName))
                 return;
 
-            if (CacheDelete != null)
-                CacheDelete(this, deleteNotification);
+            CacheDelete?.Invoke(this, deleteNotification);
         }
 
         public Task<object> GetAsync(string key, Type type)
         {
-            return _remoteCache.GetAsync(key, type,() => null);
+            return _remoteCache.GetAsync(key, type,() => Task.FromResult<object>(null));
         }
     }
 }
