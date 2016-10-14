@@ -1,33 +1,31 @@
 ﻿using System;
-using System.Runtime.Caching;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using System.Web.Caching;
 
-namespace DoubleCache.LocalCache
+namespace DoubleCache.SystemWebHttpCache
 {
-    public class MemCache : ICacheAside
+    public class HttpCache : ICacheAside
     {
+        private readonly Cache _cache;
         private readonly TimeSpan? _defaultTtl;
 
-        public MemCache(TimeSpan? defaultTtl = null)
+        public HttpCache(Cache cache, TimeSpan? defaultTtl = null)
         {
+            _cache = cache;
             _defaultTtl = defaultTtl;
         }
+
         public void Add<T>(string key, T item)
         {
-           var policy = new CacheItemPolicy();
-
-            if (_defaultTtl.HasValue)
-                policy.AbsoluteExpiration = DateTimeOffset.UtcNow.Add(_defaultTtl.Value);
-            MemoryCache.Default.Set(key, item, policy);
+            _cache.Add(key, item, null, CalculateExpire(_defaultTtl), Cache.NoSlidingExpiration, CacheItemPriority.Normal, null);
         }
 
         public void Add<T>(string key, T item, TimeSpan? timeToLive)
         {
-            var policy = new CacheItemPolicy();
-
-            if (timeToLive.HasValue)
-                policy.AbsoluteExpiration = DateTimeOffset.UtcNow.Add(timeToLive.Value);
-            MemoryCache.Default.Set(key, item, policy);
+            _cache.Add(key, item, null, CalculateExpire(timeToLive), Cache.NoSlidingExpiration, CacheItemPriority.Normal, null);
         }
 
         public T Get<T>(string key, Func<T> dataRetriever) where T : class
@@ -37,7 +35,7 @@ namespace DoubleCache.LocalCache
 
         public T Get<T>(string key, Func<T> dataRetriever, TimeSpan? timeToLive) where T : class
         {
-            var item = MemoryCache.Default.Get(key) as T;
+            var item = _cache.Get(key) as T;
             if (item != null)
                 return item;
             {
@@ -54,27 +52,11 @@ namespace DoubleCache.LocalCache
 
         public object Get(string key, Type type, Func<object> dataRetriever, TimeSpan? timeToLive)
         {
-            var item = MemoryCache.Default.Get(key);
+            var item = _cache.Get(key);
             if (item != null && item.GetType() == type)
                 return item;
 
             item = dataRetriever.Invoke();
-            Add(key, item, timeToLive);
-            return item.GetType() == type ? item : null;
-        }
-
-        public Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever)
-        {
-            return GetAsync(key, type, dataRetriever, _defaultTtl);
-        }
-
-        public async Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever, TimeSpan? timeToLive)
-        {
-            var item = MemoryCache.Default.Get(key);
-            if (item != null && item.GetType() == type)
-                return item;
-
-            item = await dataRetriever.Invoke();
             Add(key, item, timeToLive);
             return item.GetType() == type ? item : null;
         }
@@ -86,7 +68,7 @@ namespace DoubleCache.LocalCache
 
         public async Task<T> GetAsync<T>(string key, Func<Task<T>> dataRetriever, TimeSpan? timeToLive) where T : class
         {
-            var item = MemoryCache.Default.Get(key) as T;
+            var item = _cache.Get(key) as T;
             if (item != null)
                 return item;
             {
@@ -96,11 +78,34 @@ namespace DoubleCache.LocalCache
             return item;
         }
 
+        public Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever)
+        {
+            return GetAsync(key, type, dataRetriever, _defaultTtl);
+        }
+
+        public async Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever, TimeSpan? timeToLive)
+        {
+            var item = _cache.Get(key);
+            if (item != null && item.GetType() == type)
+                return item;
+
+            item = await dataRetriever.Invoke();
+            Add(key, item, timeToLive);
+            return item.GetType() == type ? item : null;
+        }
+
         public void Remove(string key)
         {
-            MemoryCache.Default.Remove(key);
+            _cache.Remove(key);
         }
 
         public TimeSpan? DefaultTtl { get { return _defaultTtl; } }
+
+        private DateTime CalculateExpire(TimeSpan? ttl)
+        {
+            return ttl.HasValue
+                ? DateTime.Now.Add(ttl.Value)
+                : DateTime.MaxValue;
+        }
     }
 }

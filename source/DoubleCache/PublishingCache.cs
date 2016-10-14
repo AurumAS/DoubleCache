@@ -109,5 +109,7 @@ namespace DoubleCache
             _cache.Remove(key);
             _cachePublisher.NotifyDelete(key);
         }
+
+        public TimeSpan? DefaultTtl { get { return _cache.DefaultTtl; } }
     }
 }
