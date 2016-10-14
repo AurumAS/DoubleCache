@@ -63,9 +63,9 @@ namespace DoubleCache.LocalCache
             return item.GetType() == type ? item : null;
         }
 
-        public async Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever)
+        public Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever)
         {
-            return await GetAsync(key, type, dataRetriever, _defaultTtl);
+            return GetAsync(key, type, dataRetriever, _defaultTtl);
         }
 
         public async Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever, TimeSpan? timeToLive)
@@ -79,9 +79,9 @@ namespace DoubleCache.LocalCache
             return item.GetType() == type ? item : null;
         }
 
-        public async Task<T> GetAsync<T>(string key, Func<Task<T>> dataRetriever) where T : class
+        public Task<T> GetAsync<T>(string key, Func<Task<T>> dataRetriever) where T : class
         {
-            return await GetAsync(key, dataRetriever, _defaultTtl);
+            return GetAsync(key, dataRetriever, _defaultTtl);
         }
 
         public async Task<T> GetAsync<T>(string key, Func<Task<T>> dataRetriever, TimeSpan? timeToLive) where T : class

@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyVersionAttribute("1.4.1")]
 [assembly: AssemblyInformationalVersionAttribute("1.4.1")]
 [assembly: AssemblyFileVersionAttribute("1.4.1")]
-[assembly: AssemblyMetadataAttribute("githash","22c3366626f0e510de13b7c1275236b691a4cb9b")]
+[assembly: AssemblyMetadataAttribute("githash","949514856fe274701539f56a68a1409dcc2e2ca0")]
 namespace System {
     internal static class AssemblyVersionInformation {
         internal const System.String AssemblyTitle = "DoubleCache";
@@ -19,6 +19,6 @@ namespace System {
         internal const System.String AssemblyVersion = "1.4.1";
         internal const System.String AssemblyInformationalVersion = "1.4.1";
         internal const System.String AssemblyFileVersion = "1.4.1";
-        internal const System.String AssemblyMetadata_githash = "22c3366626f0e510de13b7c1275236b691a4cb9b";
+        internal const System.String AssemblyMetadata_githash = "949514856fe274701539f56a68a1409dcc2e2ca0";
     }
 }
