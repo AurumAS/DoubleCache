@@ -6,12 +6,19 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescriptionAttribute("Layered distributed cache-aside implementation")]
 [assembly: GuidAttribute("505f87a8-3062-4070-af1f-cd7358ccd06a")]
 [assembly: AssemblyProductAttribute("DoubleCache")]
-[assembly: AssemblyVersionAttribute("1.1.1")]
-[assembly: AssemblyInformationalVersionAttribute("1.1.1")]
-[assembly: AssemblyFileVersionAttribute("1.1.1")]
-[assembly: AssemblyMetadataAttribute("githash","f03b5c93ea779bb44bdbe4cc77ea60fb10e1f864")]
+[assembly: AssemblyVersionAttribute("1.4.1")]
+[assembly: AssemblyInformationalVersionAttribute("1.4.1")]
+[assembly: AssemblyFileVersionAttribute("1.4.1")]
+[assembly: AssemblyMetadataAttribute("githash","22c3366626f0e510de13b7c1275236b691a4cb9b")]
 namespace System {
     internal static class AssemblyVersionInformation {
-        internal const string Version = "1.1.1";
+        internal const System.String AssemblyTitle = "DoubleCache";
+        internal const System.String AssemblyDescription = "Layered distributed cache-aside implementation";
+        internal const System.String Guid = "505f87a8-3062-4070-af1f-cd7358ccd06a";
+        internal const System.String AssemblyProduct = "DoubleCache";
+        internal const System.String AssemblyVersion = "1.4.1";
+        internal const System.String AssemblyInformationalVersion = "1.4.1";
+        internal const System.String AssemblyFileVersion = "1.4.1";
+        internal const System.String AssemblyMetadata_githash = "22c3366626f0e510de13b7c1275236b691a4cb9b";
     }
 }
