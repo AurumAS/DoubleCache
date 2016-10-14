@@ -53,6 +53,7 @@ namespace DoubleCacheTests
             TimeSpan? ttl = TimeSpan.FromMinutes(1);
 
             _staleCache.Add(key, new object());
+            System.Threading.Thread.Sleep(10);
             _staleCache.Get(key, func);
 
             System.Threading.Thread.Sleep(100);
