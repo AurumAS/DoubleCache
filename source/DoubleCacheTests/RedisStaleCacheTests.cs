@@ -66,6 +66,7 @@ namespace DoubleCacheTests
             TimeSpan? ttl = _fakeCache.DefaultTtl.Value.Add(TimeSpan.FromMinutes(1));
 
             _staleCache.Add(key, new object());
+            System.Threading.Thread.Sleep(10);
             _staleCache.Get(key, func);
 
             A.CallTo(() => 
