@@ -72,5 +72,14 @@ namespace DoubleCache
             _localCache.Remove(key);
             _remoteCache.Remove(key);
         }
+
+        public TimeSpan? DefaultTtl { get
+        {
+            return _localCache.DefaultTtl > _remoteCache.DefaultTtl
+                ? _localCache.DefaultTtl
+                : _remoteCache.DefaultTtl;
+        } }
+
+        
     }
 }

@@ -116,5 +116,7 @@ namespace DoubleCache.Redis
         {
             _database.KeyDelete(key);
         }
+
+        public TimeSpan? DefaultTtl { get { return _defaultTtl; } }
     }
 }

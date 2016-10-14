@@ -90,6 +90,8 @@ namespace DoubleCacheTests.IntegrationTests
         {
             var func = A.Fake<Func<object>>();
 
+            A.CallTo(() => func.Invoke()).Returns("A");
+
             _cacheImplementation.Get(_key, typeof(string), func);
 
             A.CallTo(() => func.Invoke()).MustHaveHappened(Repeated.Exactly.Once);
