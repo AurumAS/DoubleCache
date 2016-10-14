@@ -148,7 +148,7 @@ namespace DoubleCacheTests.IntegrationTests
 
             await _cacheImplementation.GetAsync(_key, func);
 
-            A.CallTo(() => func.Invoke()).MustHaveHappened(Repeated.Exactly.Once);
+            A.CallTo(() => func.Invoke()).MustHaveHappened(Repeated.AtLeast.Once);
         }
 
         [Fact]
@@ -200,7 +200,7 @@ namespace DoubleCacheTests.IntegrationTests
 
             await _cacheImplementation.GetAsync(_key, typeof(string), func);
 
-            A.CallTo(() => func.Invoke()).MustHaveHappened(Repeated.Exactly.Once);
+            A.CallTo(() => func.Invoke()).MustHaveHappened(Repeated.AtLeast.Once);
         }
 
         [Fact]
