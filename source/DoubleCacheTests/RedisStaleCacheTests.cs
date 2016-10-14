@@ -55,6 +55,7 @@ namespace DoubleCacheTests
             _staleCache.Add(key, new object());
             _staleCache.Get(key, func);
 
+            System.Threading.Thread.Sleep(100);
             A.CallTo(() => func()).MustHaveHappened(Repeated.Exactly.Once);
         }
         [Fact]
@@ -69,6 +70,7 @@ namespace DoubleCacheTests
             System.Threading.Thread.Sleep(10);
             _staleCache.Get(key, func);
 
+            System.Threading.Thread.Sleep(100);
             A.CallTo(() => 
                 _fakeCache.Add(key, A<object>._, ttl))
             .MustHaveHappened(Repeated.Exactly.Twice);
