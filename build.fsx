@@ -9,10 +9,11 @@ let buildDir = "./build/"
 let testDir = "./test/"
 let nugetDir = "./nuget"
 
-let references  = !! "source/DoubleCache/*.csproj"
+let references  = !! "source/DoubleCache/*.csproj" 
+                  ++ "source/DoubleCache.SystemWebCaching/DoubleCache.SystemWebCaching.csproj"
 let testReferences = !! "source/DoubleCacheTests/*.csproj"    
 
-let version = "1.5.1"
+let version = "1.6.0"
 let commitHash = Information.getCurrentSHA1(".")
 
 let projectName = "DoubleCache"
@@ -70,7 +71,25 @@ Target "CreateNuget" (fun _ ->
                             "MsgPack.Cli", "0.6.5"
             ]
             Files = [
-                    (@"DoubleCache.*", Some @"lib\net45", None)
+                    (@"DoubleCache.dll", Some @"lib\net45", None)
+                    (@"DoubleCache.pdb", Some @"lib\net45", None)
+            ]
+        }) 
+        "DoubleCache.nuspec"
+    NuGet (fun p -> 
+        {p with
+            Authors = ["Harald Schult Ulriksen / Aurum AS"]
+            Project = "DoubleCache.SystemWebCaching"
+            Description = "System.Web.Caching / HttpContext.Cache implementation for DoubleCache"                               
+            OutputPath = nugetDir
+            WorkingDir = buildDir
+            Version = version
+            Publish = false
+            Dependencies = [
+                            "DoubleCache", version
+            ]
+            Files = [
+                    (@"DoubleCache.SystemWebCaching.*", Some @"lib\net45", None)
             ]
         }) 
         "DoubleCache.nuspec"

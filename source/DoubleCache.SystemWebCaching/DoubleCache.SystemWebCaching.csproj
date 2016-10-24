@@ -7,8 +7,8 @@
     <ProjectGuid>{E0595A27-4BD7-4963-AADA-EEE4DB76D1F7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DoubleCache.SystemWebHttpCache</RootNamespace>
-    <AssemblyName>DoubleCache.SystemWebHttpCache</AssemblyName>
+    <RootNamespace>DoubleCache.SystemWebCaching</RootNamespace>
+    <AssemblyName>DoubleCache.SystemWebCaching</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />

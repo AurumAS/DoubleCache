@@ -17,7 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApiHostConsole", "Sam
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApiOwin", "Sample\SampleApiOwin\SampleApiOwin.csproj", "{94C2827E-AEEE-465A-8F10-9B6814D9ED29}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DoubleCache.SystemWebHttpCache", "DoubleCache.SystemWebHttpCache\DoubleCache.SystemWebHttpCache.csproj", "{E0595A27-4BD7-4963-AADA-EEE4DB76D1F7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DoubleCache.SystemWebCaching", "DoubleCache.SystemWebCaching\DoubleCache.SystemWebCaching.csproj", "{E0595A27-4BD7-4963-AADA-EEE4DB76D1F7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

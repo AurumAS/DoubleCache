@@ -101,9 +101,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DoubleCache.SystemWebHttpCache\DoubleCache.SystemWebHttpCache.csproj">
+    <ProjectReference Include="..\DoubleCache.SystemWebCaching\DoubleCache.SystemWebCaching.csproj">
       <Project>{e0595a27-4bd7-4963-aada-eee4db76d1f7}</Project>
-      <Name>DoubleCache.SystemWebHttpCache</Name>
+      <Name>DoubleCache.SystemWebCache</Name>
     </ProjectReference>
     <ProjectReference Include="..\DoubleCache\DoubleCache.csproj">
       <Project>{6c5d1a93-cca6-4cf2-9c76-103021f0a999}</Project>
