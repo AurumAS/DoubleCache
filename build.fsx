@@ -13,7 +13,7 @@ let references  = !! "source/DoubleCache/*.csproj"
                   ++ "source/DoubleCache.SystemWebCaching/DoubleCache.SystemWebCaching.csproj"
 let testReferences = !! "source/DoubleCacheTests/*.csproj"    
 
-let version = "1.6.0"
+let version = "2.0.0-beta.1"
 let commitHash = Information.getCurrentSHA1(".")
 
 let projectName = "DoubleCache"
@@ -66,6 +66,7 @@ Target "CreateNuget" (fun _ ->
             WorkingDir = buildDir
             Version = version
             Publish = false
+            Prerelease = true
             Dependencies = [
                             "StackExchange.Redis", "1.0.488"
                             "MsgPack.Cli", "0.6.5"
@@ -85,6 +86,7 @@ Target "CreateNuget" (fun _ ->
             WorkingDir = buildDir
             Version = version
             Publish = false
+            Prerelease = true
             Dependencies = [
                             "DoubleCache", version
             ]

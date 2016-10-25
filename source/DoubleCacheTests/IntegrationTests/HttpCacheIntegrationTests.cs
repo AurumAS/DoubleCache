@@ -1,7 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Web;
-using DoubleCache.SystemWebHttpCache;
+using DoubleCache.SystemWebCaching;
+using Shouldly;
 using Xunit;
 
 namespace DoubleCacheTests.IntegrationTests
@@ -16,6 +17,18 @@ namespace DoubleCacheTests.IntegrationTests
             _key = Guid.NewGuid().ToString();
             
             _cacheImplementation = new HttpCache(context.Cache, TimeSpan.FromMinutes(1));
+        }
+
+        [Fact]
+        public void Cache_Null_Returns_Null()
+        {
+            var key = Guid.NewGuid().ToString();
+
+            _cacheImplementation.Add<string>(key, null);
+
+            var result = _cacheImplementation.Get(key, () => "a");
+
+            result.ShouldBeNull();
         }
     }
 }
