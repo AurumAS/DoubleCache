@@ -11,7 +11,7 @@ namespace DoubleCache
         {
             var remoteCache = new RedisCache(redisConnection.GetDatabase(), itemSerializer, defaultTtl);
             return new DoubleCache(
-              new SubscribingCache(new LocalCache.MemCache(defaultTtl), new RedisSubscriber(redisConnection, remoteCache, itemSerializer)),
+              new SubscribingCache(new LocalCache.WrappingMemoryCache(defaultTtl), new RedisSubscriber(redisConnection, remoteCache, itemSerializer)),
               new PublishingCache(remoteCache, new RedisPublisher(redisConnection, itemSerializer)));
         }
     }
