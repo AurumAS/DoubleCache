@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 
 namespace DoubleCache.LocalCache
 {
+    [Obsolete("This implementation does not accept caching of null values, consider using WrappingMemoryCache instead")]
     public class MemCache : ICacheAside
     {
         private readonly TimeSpan? _defaultTtl;
