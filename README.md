@@ -60,10 +60,19 @@ public interface ICacheAside
 The Add and remove methods are implemented with fire and forget, hence it does not need to be Async as this is handled by the StackExchange.Redis client.
 
 DoubleCache comes with the following implementations of this interface
-* LocalCache.MemCache - using System.Runtime.Memory
+* *[obsolete]* LocalCache.MemCache - using System.Runtime.Memory, does not support null items. 
+* LocalCache.WrappingMemoryCache - Allows storage of null items in Memory cache.* 
+* SystemWebCaching.HttpCache - An in memory cache using HttpContext.Cache  
 * Redis.RedisCache - using StackExchange.Redis client
+* Redis.RedisStaleCache - Use redis as a stale cache in order to mitigate cache stampede. 
 * SubscribingCache - a decorator supporting push notifications of cache updates
 * PublishingCache - a decorator publishing cache changes
 * DoubleCache - a decorator wrapping a local and a remote cache
 
+\* using a custom proxy object holding the cache items. This is transparent to the client.
+
 Depending on your cache need, you can combine these implementations and decorators as you need. The most complete example would be a DoubleCache which takes a local cache decorated with a SubscribingCache and a RedisCache decorated with a PublishingCache. This will result in a local cache that will be in sync with the other local caches; if a value isn't found the value will be retrieved from Redis before ultimately being resolved using the func provided to the cache.
+
+###Redis Stale Cache
+Extends TTL for all objects stored in Redis. Verifies TTL when reading data from redis. If this is less than the default TTL on the redis cache, the cached item will be returned and a new fetch from the dataretriever will be extecuted on a separate thread. Storing the result in the cache. 
+
