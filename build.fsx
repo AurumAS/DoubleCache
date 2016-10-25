@@ -66,7 +66,6 @@ Target "CreateNuget" (fun _ ->
             WorkingDir = buildDir
             Version = version
             Publish = false
-            Prerelease = true
             Dependencies = [
                             "StackExchange.Redis", "1.0.488"
                             "MsgPack.Cli", "0.6.5"
@@ -86,7 +85,6 @@ Target "CreateNuget" (fun _ ->
             WorkingDir = buildDir
             Version = version
             Publish = false
-            Prerelease = true
             Dependencies = [
                             "DoubleCache", version
             ]
