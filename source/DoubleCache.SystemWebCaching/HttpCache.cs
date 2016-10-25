@@ -78,13 +78,14 @@ namespace DoubleCache.SystemWebCaching
 
         public async Task<T> GetAsync<T>(string key, Func<Task<T>> dataRetriever, TimeSpan? timeToLive) where T : class
         {
-            var item = _cache.Get(key) as T;
-            if (item != null)
-                return item;
-            {
-                item = await dataRetriever.Invoke();
-                Add(key, item, timeToLive);
-            }
+            var wrapper = _cache.Get(key) as CacheItemWrapper;
+            if (wrapper != null)
+                return wrapper.Item as T;
+            
+            var item = await dataRetriever.Invoke();
+
+            Add(key, item, timeToLive);
+            
             return item;
         }
 
@@ -95,13 +96,17 @@ namespace DoubleCache.SystemWebCaching
 
         public async Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever, TimeSpan? timeToLive)
         {
-            var item = _cache.Get(key);
-            if (item != null && item.GetType() == type)
-                return item;
+            var wrapper = _cache.Get(key) as CacheItemWrapper;
+            if (wrapper != null)
+                return wrapper.Item;
 
-            item = await dataRetriever.Invoke();
+
+            var item = await dataRetriever.Invoke();
+            item = item.GetType() == type ? item : null;
+
             Add(key, item, timeToLive);
-            return item.GetType() == type ? item : null;
+
+            return item;
         }
 
         public void Remove(string key)

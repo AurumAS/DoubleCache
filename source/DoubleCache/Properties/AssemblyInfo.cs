@@ -6,19 +6,19 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescriptionAttribute("Layered distributed cache-aside implementation")]
 [assembly: GuidAttribute("505f87a8-3062-4070-af1f-cd7358ccd06a")]
 [assembly: AssemblyProductAttribute("DoubleCache")]
-[assembly: AssemblyVersionAttribute("1.6.0")]
-[assembly: AssemblyInformationalVersionAttribute("1.6.0")]
-[assembly: AssemblyFileVersionAttribute("1.6.0")]
-[assembly: AssemblyMetadataAttribute("githash","ac30f57cc769194a07f4112cf91eddc153a50b4a")]
+[assembly: AssemblyVersionAttribute("2.0.0")]
+[assembly: AssemblyInformationalVersionAttribute("2.0.0-beta.1")]
+[assembly: AssemblyFileVersionAttribute("2.0.0")]
+[assembly: AssemblyMetadataAttribute("githash","6dd11eaf4f0204d3834644bf1ec8a0736cf80f3d")]
 namespace System {
     internal static class AssemblyVersionInformation {
         internal const System.String AssemblyTitle = "DoubleCache";
         internal const System.String AssemblyDescription = "Layered distributed cache-aside implementation";
         internal const System.String Guid = "505f87a8-3062-4070-af1f-cd7358ccd06a";
         internal const System.String AssemblyProduct = "DoubleCache";
-        internal const System.String AssemblyVersion = "1.6.0";
-        internal const System.String AssemblyInformationalVersion = "1.6.0";
-        internal const System.String AssemblyFileVersion = "1.6.0";
-        internal const System.String AssemblyMetadata_githash = "ac30f57cc769194a07f4112cf91eddc153a50b4a";
+        internal const System.String AssemblyVersion = "2.0.0";
+        internal const System.String AssemblyInformationalVersion = "2.0.0-beta.6";
+        internal const System.String AssemblyFileVersion = "2.0.0";
+        internal const System.String AssemblyMetadata_githash = "6dd11eaf4f0204d3834644bf1ec8a0736cf80f3d";
     }
 }
