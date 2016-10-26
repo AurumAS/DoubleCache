@@ -80,7 +80,7 @@ namespace DoubleCache.LocalCache
             if (wrapper != null)
                 return wrapper.Item;
 
-            var item = await dataRetriever.Invoke();
+            var item = await dataRetriever.Invoke().ConfigureAwait(false);
             Add(key, item, timeToLive);
             return item.GetType() == type ? item : null;
         }
@@ -96,8 +96,8 @@ namespace DoubleCache.LocalCache
             if (wrapper != null)
                 return wrapper.Item as T;
            
-                var item = await dataRetriever.Invoke();
-                Add(key, item, timeToLive);
+                var item = await dataRetriever.Invoke().ConfigureAwait(false);
+            Add(key, item, timeToLive);
 
             return item;
         }

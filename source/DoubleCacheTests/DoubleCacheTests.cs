@@ -81,7 +81,7 @@ namespace DoubleCacheTests
         [Fact]
         public async Task GetAsync_CalledOnLocal()
         {
-            await _doubleCache.GetAsync("A", typeof(string), null);
+            await _doubleCache.GetAsync("A", typeof(string), null).ConfigureAwait(false);
 
             A.CallTo(() => _local.GetAsync("A", A<Type>.Ignored, A<Func<Task<object>>>.Ignored)).MustHaveHappened(Repeated.Exactly.Once);
             A.CallTo(() => _remote.GetAsync("A", A<Type>.Ignored, A<Func<Task<object>>>.Ignored)).MustNotHaveHappened();

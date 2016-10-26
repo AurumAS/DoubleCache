@@ -82,11 +82,11 @@ namespace DoubleCache.Redis
 
         public async Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever, TimeSpan? timeToLive)
         {
-            var packedBytes = await _database.StringGetAsync(key);
+            var packedBytes = await _database.StringGetAsync(key).ConfigureAwait(false);
             if (!packedBytes.IsNull)
                 return _itemSerializer.Deserialize(packedBytes, type);
-
-            var item = await dataRetriever.Invoke();
+        
+            var item = await dataRetriever.Invoke().ConfigureAwait(false);
             if (item != null && item.GetType() == type)
             {
                 Add(key, item, timeToLive);
@@ -103,11 +103,11 @@ namespace DoubleCache.Redis
 
         public async Task<T> GetAsync<T>(string key, Func<Task<T>> dataRetriever, TimeSpan? timeToLive) where T : class
         {
-            var packedBytes = await _database.StringGetAsync(key);
+            var packedBytes = await _database.StringGetAsync(key).ConfigureAwait(false);
             if (!packedBytes.IsNull)
                 return _itemSerializer.Deserialize<T>(packedBytes);
 
-            var item = await dataRetriever.Invoke();
+            var item = await dataRetriever.Invoke().ConfigureAwait(false);
             Add(key, item, timeToLive);
             return item;
         }
