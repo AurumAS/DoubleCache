@@ -82,7 +82,7 @@ namespace DoubleCache.LocalCache
 
             var item = await dataRetriever.Invoke().ConfigureAwait(false);
             Add(key, item, timeToLive);
-            return item.GetType() == type ? item : null;
+            return item == null || item.GetType() == type ? item : null;
         }
 
         public Task<T> GetAsync<T>(string key, Func<Task<T>> dataRetriever) where T : class

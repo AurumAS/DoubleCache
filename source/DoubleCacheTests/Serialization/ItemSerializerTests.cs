@@ -21,15 +21,20 @@ namespace DoubleCacheTests.Serialization
         }
         [Theory]
         [InlineData("a")]
+        [InlineData(null)]
         [CacheNotificationData("test","test",1)]
         public void RoundtripSerialize<T>(T input)
         {
             var result = serializer.Deserialize(serializer.Serialize(input), typeof(T));
 
-            result.ShouldBeOfType<T>();
-
-            if (result is string)
-                result.ShouldBe(input);
+            if (input == null)
+                result.ShouldBeNull();
+            else
+            {
+                result.ShouldBeOfType<T>();
+                if (result is string)
+                    result.ShouldBe(input);
+            }
         }
 
         [Theory]

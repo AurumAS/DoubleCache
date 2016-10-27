@@ -12,7 +12,6 @@ namespace DoubleCacheTests.IntegrationTests
         protected string _key;
         protected ICacheAside _cacheImplementation;
 
-
         [Fact]
         public void Get_ExistingValue_ReturnsValue()
         {
@@ -251,6 +250,18 @@ namespace DoubleCacheTests.IntegrationTests
 
             A.CallTo(() => func.Invoke()).MustHaveHappened(Repeated.Exactly.Once);
             result.ShouldBe("B");
+        }
+
+        [Fact]
+        public virtual void Cache_Null_Returns_Null()
+        {
+            var key = Guid.NewGuid().ToString();
+
+            _cacheImplementation.Add<string>(key, null);
+
+            var result = _cacheImplementation.Get(key, () => "a");
+
+            result.ShouldBeNull();
         }
     }
 }
