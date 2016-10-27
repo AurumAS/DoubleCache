@@ -13,7 +13,7 @@ let references  = !! "source/DoubleCache/*.csproj"
                   ++ "source/DoubleCache.SystemWebCaching/DoubleCache.SystemWebCaching.csproj"
 let testReferences = !! "source/DoubleCacheTests/*.csproj"    
 
-let version = "2.0.0-beta2"
+let version = "2.0.0-beta4"
 let commitHash = Information.getCurrentSHA1(".")
 
 let projectName = "DoubleCache"

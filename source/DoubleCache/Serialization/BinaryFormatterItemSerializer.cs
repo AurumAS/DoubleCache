@@ -1,13 +1,21 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 
 namespace DoubleCache.Serialization
 {
     public class BinaryFormatterItemSerializer : IItemSerializer
     {
+        private static ConcurrentDictionary<Type,MethodInfo> _typeCache = new ConcurrentDictionary<Type,MethodInfo>();
+        
         public byte[] Serialize<T>(T item)
         {
+            if (item == null)
+                return new byte[0];
+
             var formatter = new BinaryFormatter();
 
             byte[] itemBytes;
@@ -23,6 +31,9 @@ namespace DoubleCache.Serialization
 
         public object Deserialize(byte[] bytes, Type type)
         {
+            if (bytes.Length == 0)
+                return type.IsValueType ? Activator.CreateInstance(type) : null;
+            
             var formatter = new BinaryFormatter();
 
             object item;
@@ -36,6 +47,9 @@ namespace DoubleCache.Serialization
 
         public T Deserialize<T>(Stream stream)
         {
+            if (stream.Length == 0)
+                return default(T);
+
             var formatter = new BinaryFormatter();
 
             return (T)formatter.Deserialize(stream);
@@ -44,6 +58,9 @@ namespace DoubleCache.Serialization
 
         public T Deserialize<T>(byte[] bytes)
         {
+            if (bytes.Length == 0)
+                return default(T);
+
             var formatter = new BinaryFormatter();
 
             object item;
@@ -53,6 +70,10 @@ namespace DoubleCache.Serialization
             }
 
             return (T)item;
+        }
+        private static T GetDefault<T>()
+        {
+            return default(T);
         }
     }
 }

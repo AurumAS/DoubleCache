@@ -8,7 +8,7 @@ namespace DoubleCache.LocalCache
     public class MemCache : ICacheAside
     {
         private readonly TimeSpan? _defaultTtl;
-
+        
         public MemCache(TimeSpan? defaultTtl = null)
         {
             _defaultTtl = defaultTtl;
