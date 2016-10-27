@@ -4,22 +4,27 @@ using System.Threading.Tasks;
 
 namespace DoubleCache.LocalCache
 {
-    [Obsolete("This implementation does not accept caching of null values, consider using WrappingMemoryCache instead")]
-    public class MemCache : ICacheAside
+    public class WrappingMemoryCache : ICacheAside
     {
+        internal class CacheItemWrapper
+        {
+            internal object Item { get; }
+
+            internal CacheItemWrapper(object item)
+            {
+                Item = item;
+            }
+        }
+
         private readonly TimeSpan? _defaultTtl;
-        
-        public MemCache(TimeSpan? defaultTtl = null)
+
+        public WrappingMemoryCache(TimeSpan? defaultTtl = null)
         {
             _defaultTtl = defaultTtl;
         }
         public void Add<T>(string key, T item)
         {
-           var policy = new CacheItemPolicy();
-
-            if (_defaultTtl.HasValue)
-                policy.AbsoluteExpiration = DateTimeOffset.UtcNow.Add(_defaultTtl.Value);
-            MemoryCache.Default.Set(key, item, policy);
+           Add(key,item,_defaultTtl);
         }
 
         public void Add<T>(string key, T item, TimeSpan? timeToLive)
@@ -28,7 +33,7 @@ namespace DoubleCache.LocalCache
 
             if (timeToLive.HasValue)
                 policy.AbsoluteExpiration = DateTimeOffset.UtcNow.Add(timeToLive.Value);
-            MemoryCache.Default.Set(key, item, policy);
+            MemoryCache.Default.Set(key, new CacheItemWrapper(item), policy);
         }
 
         public T Get<T>(string key, Func<T> dataRetriever) where T : class
@@ -38,13 +43,13 @@ namespace DoubleCache.LocalCache
 
         public T Get<T>(string key, Func<T> dataRetriever, TimeSpan? timeToLive) where T : class
         {
-            var item = MemoryCache.Default.Get(key) as T;
-            if (item != null)
-                return item;
-            {
-                item = dataRetriever.Invoke();
-                Add(key, item, timeToLive);
-            }
+            var wrapper = MemoryCache.Default.Get(key) as CacheItemWrapper;
+            if (wrapper != null)
+                return wrapper.Item as T;
+            
+            var item = dataRetriever.Invoke();
+            Add(key, item, timeToLive);
+           
             return item;
         }
 
@@ -55,11 +60,11 @@ namespace DoubleCache.LocalCache
 
         public object Get(string key, Type type, Func<object> dataRetriever, TimeSpan? timeToLive)
         {
-            var item = MemoryCache.Default.Get(key);
-            if (item != null && item.GetType() == type)
-                return item;
+            var wrapper = MemoryCache.Default.Get(key) as CacheItemWrapper;
+            if (wrapper != null)
+                return wrapper.Item;
 
-            item = dataRetriever.Invoke();
+            var item = dataRetriever.Invoke();
             Add(key, item, timeToLive);
             return item.GetType() == type ? item : null;
         }
@@ -71,13 +76,13 @@ namespace DoubleCache.LocalCache
 
         public async Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever, TimeSpan? timeToLive)
         {
-            var item = MemoryCache.Default.Get(key);
-            if (item != null && item.GetType() == type)
-                return item;
+            var wrapper = MemoryCache.Default.Get(key) as CacheItemWrapper;
+            if (wrapper != null)
+                return wrapper.Item;
 
-            item = await dataRetriever.Invoke().ConfigureAwait(false);
+            var item = await dataRetriever.Invoke().ConfigureAwait(false);
             Add(key, item, timeToLive);
-            return item.GetType() == type ? item : null;
+            return item == null || item.GetType() == type ? item : null;
         }
 
         public Task<T> GetAsync<T>(string key, Func<Task<T>> dataRetriever) where T : class
@@ -87,13 +92,13 @@ namespace DoubleCache.LocalCache
 
         public async Task<T> GetAsync<T>(string key, Func<Task<T>> dataRetriever, TimeSpan? timeToLive) where T : class
         {
-            var item = MemoryCache.Default.Get(key) as T;
-            if (item != null)
-                return item;
-            {
-                item = await dataRetriever.Invoke().ConfigureAwait(false);
-                Add(key, item, timeToLive);
-            }
+            var wrapper = MemoryCache.Default.Get(key) as CacheItemWrapper;
+            if (wrapper != null)
+                return wrapper.Item as T;
+           
+                var item = await dataRetriever.Invoke().ConfigureAwait(false);
+            Add(key, item, timeToLive);
+
             return item;
         }
 

@@ -56,6 +56,7 @@
     <Compile Include="ICachePublisher.cs" />
     <Compile Include="ICacheSubscriber.cs" />
     <Compile Include="LocalCache\MemCache.cs" />
+    <Compile Include="LocalCache\WrappingMemoryCache.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PublishingCache.cs" />
     <Compile Include="Redis\RedisCache.cs" />

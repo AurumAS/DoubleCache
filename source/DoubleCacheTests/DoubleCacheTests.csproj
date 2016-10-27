@@ -78,7 +78,9 @@
     <Compile Include="DoubleCacheTests.cs" />
     <Compile Include="IntegrationTests\HttpCacheIntegrationTests.cs" />
     <Compile Include="IntegrationTests\MemoryCacheTests.cs" />
+    <Compile Include="IntegrationTests\PubSubDoubleCacheTest.cs" />
     <Compile Include="IntegrationTests\RedisStaleCacheIntegrationTests.cs" />
+    <Compile Include="IntegrationTests\WrappingMemoryCacheTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PublisherTests.cs" />
     <Compile Include="PublishingCacheTests.cs" />
