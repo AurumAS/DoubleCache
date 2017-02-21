@@ -3,6 +3,9 @@
 
 A layered distributed cache implementation following [cache-aside](https://msdn.microsoft.com/en-us/library/dn589799.aspx) and decorator pattern. Backed by Redis, combined with an in-memory cache.  
 
+##Build status
+[![Build status](https://ci.appveyor.com/api/projects/status/8qnxdit4rugd7hij?svg=true)](https://ci.appveyor.com/project/BjrnEinarBjarnes/doublecache)
+
 ##Usage
 Add a reference to DoubleCache using nuget `Install-Package DoubleCache` and initialize the DoubleCache using a factory method, providing redis connection and a serializer.
 ```
