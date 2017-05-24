@@ -29,7 +29,7 @@ namespace DoubleCacheTests
             var processStartInfo = new ProcessStartInfo(".\\Redis\\redis-server.exe")
             {
                 UseShellExecute = false,
-                Arguments = string.Format("--port {0} --bind 127.0.0.1 --maxheap 10MB", _port),
+                Arguments = string.Format("--port {0} --bind 127.0.0.1", _port),
                 WindowStyle = ProcessWindowStyle.Maximized,
                 CreateNoWindow = true,
                 LoadUserProfile = false,
@@ -40,6 +40,8 @@ namespace DoubleCacheTests
 
             _process = Process.Start(processStartInfo);
             _process.BeginOutputReadLine();
+            if (_process.HasExited)
+                throw new Exception("Unable to start redis");
         }
 
         protected virtual void Dispose(bool disposing)
@@ -50,9 +52,11 @@ namespace DoubleCacheTests
 
             try
             {
-                _process.CancelOutputRead();
+                if (!_process.HasExited)
+                { _process.CancelOutputRead();
                 _process.Kill();
                 _process.WaitForExit(2000);
+                    }
 
                 if (disposing)
                     _process.Dispose();
