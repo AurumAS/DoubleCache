@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using DoubleCache.Redis;
 
 namespace DoubleCache
 {
@@ -7,11 +8,13 @@ namespace DoubleCache
     {
         private readonly ICacheAside _localCache;
         private readonly ICacheAside _remoteCache;
+        private readonly IKeyTimeToLive _remoteTimeToLive;
            
-        public DoubleCache(ICacheAside localCache,ICacheAside remoteCache)
+        public DoubleCache(ICacheAside localCache,ICacheAside remoteCache, IKeyTimeToLive remoteTimeToLive)
         {
             _localCache = localCache;
             _remoteCache = remoteCache;
+            _remoteTimeToLive = remoteTimeToLive;
         }
 
         public void Add<T>(string key, T item)
@@ -28,43 +31,43 @@ namespace DoubleCache
 
         public T Get<T>(string key, Func<T> dataRetriever) where T : class
         {
-            return _localCache.Get(key, () => _remoteCache.Get(key, dataRetriever));
+            return _localCache.Get(key, () => _remoteCache.Get(key, dataRetriever), _remoteTimeToLive.KeyTimeToLive(key));
         }
 
         public T Get<T>(string key, Func<T> dataRetriever, TimeSpan? timeToLive) where T : class
         {
-            return _localCache.Get(key, () => _remoteCache.Get(key, dataRetriever, timeToLive), timeToLive);
+            return _localCache.Get(key, () => _remoteCache.Get(key, dataRetriever, timeToLive), _remoteTimeToLive.KeyTimeToLive(key));
 
         }
 
         public object Get(string key, Type type, Func<object> dataRetriever)
         {
-            return _localCache.Get(key, type, () => _remoteCache.Get(key, type, dataRetriever));
+            return _localCache.Get(key, type, () => _remoteCache.Get(key, type, dataRetriever), _remoteTimeToLive.KeyTimeToLive(key));
         }
 
         public object Get(string key, Type type, Func<object> dataRetriever, TimeSpan? timeToLive)
         {
-            return _localCache.Get(key, type, () => _remoteCache.Get(key, type, dataRetriever, timeToLive), timeToLive);
+            return _localCache.Get(key, type, () => _remoteCache.Get(key, type, dataRetriever, timeToLive), _remoteTimeToLive.KeyTimeToLive(key));
         }
 
         public Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever)
         {
-            return _localCache.GetAsync(key, type, () => _remoteCache.GetAsync(key, type, dataRetriever));
+            return _localCache.GetAsync(key, type, () => _remoteCache.GetAsync(key, type, dataRetriever), _remoteTimeToLive.KeyTimeToLive(key));
         }
 
         public Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever, TimeSpan? timeToLive)
         {
-            return _localCache.GetAsync(key, type, () => _remoteCache.GetAsync(key, type, dataRetriever), timeToLive);
+            return _localCache.GetAsync(key, type, () => _remoteCache.GetAsync(key, type, dataRetriever), _remoteTimeToLive.KeyTimeToLive(key));
         }
 
         public Task<T> GetAsync<T>(string key, Func<Task<T>> dataRetriever) where T : class
         {
-            return _localCache.GetAsync(key, () => _remoteCache.GetAsync(key, dataRetriever));
+            return _localCache.GetAsync(key, () => _remoteCache.GetAsync(key, dataRetriever), _remoteTimeToLive.KeyTimeToLive(key));
         }
 
         public Task<T> GetAsync<T>(string key, Func<Task<T>> dataRetriever, TimeSpan? timeToLive) where T : class
         {
-            return _localCache.GetAsync(key, () => _remoteCache.GetAsync(key, dataRetriever),timeToLive);
+            return _localCache.GetAsync(key, () => _remoteCache.GetAsync(key, dataRetriever, timeToLive), _remoteTimeToLive.KeyTimeToLive(key));
         }
 
         public void Remove(string key)

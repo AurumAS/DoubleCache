@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace DoubleCache.Redis
 {
-    public class RedisCache : ICacheAside
+    public class RedisCache : ICacheAside, IKeyTimeToLive 
     {
         private readonly IDatabase _database;
         private readonly IItemSerializer _itemSerializer;
@@ -120,6 +120,16 @@ namespace DoubleCache.Redis
         public bool Exists(string key)
         {
             return _database.KeyExists(key);
+        }
+
+        public Task<TimeSpan?> KeyTimeToLiveAsync(string key)
+        {
+            return _database.KeyTimeToLiveAsync(key);
+        }
+
+        public TimeSpan? KeyTimeToLive(string key)
+        {
+            return _database.KeyTimeToLive(key);
         }
 
         public TimeSpan? DefaultTtl { get { return _defaultTtl; } }
