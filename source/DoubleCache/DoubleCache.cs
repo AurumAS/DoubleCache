@@ -73,6 +73,11 @@ namespace DoubleCache
             _remoteCache.Remove(key);
         }
 
+        public bool Exists(string key)
+        {
+            return _localCache.Exists(key) && _remoteCache.Exists(key);
+        }
+
         public TimeSpan? DefaultTtl { get
         {
             return _localCache.DefaultTtl > _remoteCache.DefaultTtl

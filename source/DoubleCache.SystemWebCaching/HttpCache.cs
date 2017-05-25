@@ -122,5 +122,10 @@ namespace DoubleCache.SystemWebCaching
                 ? DateTime.Now.Add(ttl.Value)
                 : DateTime.MaxValue;
         }
+
+        public bool Exists(string key)
+        {
+            return _cache.Get(key) != null;
+        }
     }
 }

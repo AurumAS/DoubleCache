@@ -102,6 +102,11 @@ namespace DoubleCache.LocalCache
             MemoryCache.Default.Remove(key);
         }
 
+        public bool Exists(string key)
+        {
+            return MemoryCache.Default.Get(key) != null;
+        }
+
         public TimeSpan? DefaultTtl { get { return _defaultTtl; } }
     }
 }

@@ -62,12 +62,13 @@ The Add and remove methods are implemented with fire and forget, hence it does n
 DoubleCache comes with the following implementations of this interface
 * *[obsolete]* LocalCache.MemCache - using System.Runtime.Memory, does not support null items. 
 * LocalCache.WrappingMemoryCache - Allows storage of null items in Memory cache.* 
-* SystemWebCaching.HttpCache - An in memory cache using HttpContext.Cache  
-* Redis.RedisCache - using StackExchange.Redis client
+* SystemWebCaching.HttpCache - An in memory cache using HttpContext.Cache.
+* Redis.RedisCache - using StackExchange.Redis client.
 * Redis.RedisStaleCache - Use redis as a stale cache in order to mitigate cache stampede. 
-* SubscribingCache - a decorator supporting push notifications of cache updates
-* PublishingCache - a decorator publishing cache changes
-* DoubleCache - a decorator wrapping a local and a remote cache
+* SubscribingCache - a decorator supporting push notifications of cache updates.
+* ExistingItemSubscribingCache - a decorator supporting push notifications, which will only update cache if the item already exists.
+* PublishingCache - a decorator publishing cache changes.
+* DoubleCache - a decorator wrapping a local and a remote cache.
 
 \* using a custom proxy object holding the cache items. This is transparent to the client.
 

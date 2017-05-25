@@ -22,6 +22,7 @@ namespace DoubleCache
 
         void Remove(string key);
 
+        bool Exists(string key);
         TimeSpan? DefaultTtl { get; }
     }
 }

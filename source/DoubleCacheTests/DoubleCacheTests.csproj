@@ -71,6 +71,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExistingSubscribingCacheTests.cs" />
     <Compile Include="IntegrationTests\CacheFactoryTests.cs" />
     <Compile Include="IntegrationTests\CacheImplementationTests.cs" />
     <Compile Include="DoubleCacheTests.cs" />

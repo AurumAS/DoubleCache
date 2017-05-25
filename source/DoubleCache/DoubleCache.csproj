@@ -51,6 +51,7 @@
     <Compile Include="CacheFactory.cs" />
     <Compile Include="CacheUpdateNotification.cs" />
     <Compile Include="DoubleCache.cs" />
+    <Compile Include="ExistingItemSubscribingCache.cs" />
     <Compile Include="ICacheAside.cs" />
     <Compile Include="ICachePublisher.cs" />
     <Compile Include="ICacheSubscriber.cs" />

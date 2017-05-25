@@ -275,5 +275,22 @@ namespace DoubleCacheTests.IntegrationTests
 
             result.ShouldBeNull();
         }
+
+        [Fact]
+        public void Exists_ItemDoesExsists_ReturnsTrue()
+        {
+            var key = Guid.NewGuid().ToString();
+            _cacheImplementation.Add(key, "A");
+
+            _cacheImplementation.Exists(key).ShouldBeTrue();
+        }
+
+        [Fact]
+        public void Exists_ItemDoesNotExsists_ReturnsFalse()
+        {
+            var key = Guid.NewGuid().ToString();
+
+            _cacheImplementation.Exists(key).ShouldBeFalse();
+        }
     }
 }

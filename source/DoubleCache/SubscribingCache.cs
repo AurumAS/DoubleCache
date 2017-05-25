@@ -97,6 +97,11 @@ namespace DoubleCache
             _cache.Remove(key);
         }
 
+        public bool Exists(string key)
+        {
+            return _cache.Exists(key);
+        }
+
         public TimeSpan? DefaultTtl { get { return _cache.DefaultTtl;  } }
     }
 }

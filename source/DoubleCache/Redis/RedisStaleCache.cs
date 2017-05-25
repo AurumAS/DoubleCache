@@ -183,6 +183,11 @@ namespace DoubleCache.Redis
             _redisCache.Remove(key);
         }
 
+        public bool Exists(string key)
+        {
+            return _redisCache.Exists(key);
+        }
+
         public TimeSpan? DefaultTtl { get { return _redisCache.DefaultTtl; } }
     }
 }

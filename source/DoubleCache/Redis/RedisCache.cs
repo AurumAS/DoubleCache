@@ -117,6 +117,11 @@ namespace DoubleCache.Redis
             _database.KeyDelete(key);
         }
 
+        public bool Exists(string key)
+        {
+            return _database.KeyExists(key);
+        }
+
         public TimeSpan? DefaultTtl { get { return _defaultTtl; } }
     }
 }
