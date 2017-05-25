@@ -18,9 +18,11 @@ namespace CacheSample
 
         static DoubleCacheController()
         {
+            var remoteCache = new RedisCache(ConnectionMultiplexer.Connect("localhost").GetDatabase(), new MsgPackItemSerializer());
             _doubleCache = new DoubleCache.DoubleCache(
-                new DoubleCache.LocalCache.MemCache(),
-                new RedisCache(ConnectionMultiplexer.Connect("localhost").GetDatabase(), new MsgPackItemSerializer()));
+                new DoubleCache.LocalCache.WrappingMemoryCache(),
+                remoteCache,
+                remoteCache);
         }
 
         public DoubleCacheController()

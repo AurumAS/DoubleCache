@@ -119,21 +119,21 @@ namespace DoubleCache.Redis
             if (timeToLive.HasValue)
                 staleTtl = timeToLive.Value.Add(_staleDuration);
 
-            var item = await _redisCache.GetAsync(key, dataRetriever, staleTtl);
-            var ttl = await _database.KeyTimeToLiveAsync(key);
+            var item = await _redisCache.GetAsync(key, dataRetriever, staleTtl).ConfigureAwait(false);
+            var ttl = await _database.KeyTimeToLiveAsync(key).ConfigureAwait(false);
             if (!ttl.HasValue || ttl.Value < _staleDuration)
             {
                 ttl = ttl == null
                     ? _staleDuration.Add(_staleDuration)
                     : ttl.Value.Add(_staleDuration);
 
-                await _database.KeyExpireAsync(key, ttl);
+                await _database.KeyExpireAsync(key, ttl).ConfigureAwait(false);
 
                 ThreadPool.QueueUserWorkItem(async o =>
                 {
                     try
                     {
-                        _redisCache.Add(key, await dataRetriever.Invoke(), staleTtl);
+                        _redisCache.Add(key, await dataRetriever.Invoke().ConfigureAwait(false), staleTtl);
                     }
                     catch
                     { //make sure we do not crash. 
@@ -154,21 +154,21 @@ namespace DoubleCache.Redis
             if (timeToLive.HasValue)
                 staleTtl = timeToLive.Value.Add(_staleDuration);
 
-            var item = await _redisCache.GetAsync(key, type, dataRetriever, staleTtl);
-            var ttl = await _database.KeyTimeToLiveAsync(key);
+            var item = await _redisCache.GetAsync(key, type, dataRetriever, staleTtl).ConfigureAwait(false);
+            var ttl = await _database.KeyTimeToLiveAsync(key).ConfigureAwait(false);
             if (!ttl.HasValue || ttl.Value < _staleDuration)
             {
                 ttl = ttl == null
                     ? _staleDuration.Add(_staleDuration)
                     : ttl.Value.Add(_staleDuration);
 
-                await _database.KeyExpireAsync(key, ttl);
+                await _database.KeyExpireAsync(key, ttl).ConfigureAwait(false);
 
                 ThreadPool.QueueUserWorkItem(async o =>
                 {
                     try
                     {
-                        _redisCache.Add(key, await dataRetriever.Invoke(), timeToLive);
+                        _redisCache.Add(key, await dataRetriever.Invoke().ConfigureAwait(false), timeToLive);
                     }
                     catch
                     { //make sure we do not crash. 
@@ -181,6 +181,11 @@ namespace DoubleCache.Redis
         public void Remove(string key)
         {
             _redisCache.Remove(key);
+        }
+
+        public bool Exists(string key)
+        {
+            return _redisCache.Exists(key);
         }
 
         public TimeSpan? DefaultTtl { get { return _redisCache.DefaultTtl; } }

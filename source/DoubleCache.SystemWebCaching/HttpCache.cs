@@ -1,14 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Web.Caching;
 
-namespace DoubleCache.SystemWebHttpCache
+namespace DoubleCache.SystemWebCaching
 {
     public class HttpCache : ICacheAside
     {
+        internal class CacheItemWrapper
+        {
+            internal object Item { get; }
+
+            internal CacheItemWrapper(object item)
+            {
+                Item = item;
+            }
+        }
+
         private readonly Cache _cache;
         private readonly TimeSpan? _defaultTtl;
 
@@ -20,12 +27,12 @@ namespace DoubleCache.SystemWebHttpCache
 
         public void Add<T>(string key, T item)
         {
-            _cache.Add(key, item, null, CalculateExpire(_defaultTtl), Cache.NoSlidingExpiration, CacheItemPriority.Normal, null);
+            Add(key,item,_defaultTtl);
         }
 
         public void Add<T>(string key, T item, TimeSpan? timeToLive)
         {
-            _cache.Add(key, item, null, CalculateExpire(timeToLive), Cache.NoSlidingExpiration, CacheItemPriority.Normal, null);
+            _cache.Add(key, new CacheItemWrapper(item), null, CalculateExpire(timeToLive), Cache.NoSlidingExpiration, CacheItemPriority.Normal, null);
         }
 
         public T Get<T>(string key, Func<T> dataRetriever) where T : class
@@ -35,13 +42,14 @@ namespace DoubleCache.SystemWebHttpCache
 
         public T Get<T>(string key, Func<T> dataRetriever, TimeSpan? timeToLive) where T : class
         {
-            var item = _cache.Get(key) as T;
-            if (item != null)
-                return item;
-            {
-                item = dataRetriever.Invoke();
-                Add(key, item, timeToLive);
-            }
+            var wrapper = _cache.Get(key) as CacheItemWrapper;
+            if (wrapper != null)
+                return wrapper.Item as T;
+            
+            var item = dataRetriever.Invoke();
+
+            Add(key, item, timeToLive);
+
             return item;
         }
 
@@ -52,13 +60,15 @@ namespace DoubleCache.SystemWebHttpCache
 
         public object Get(string key, Type type, Func<object> dataRetriever, TimeSpan? timeToLive)
         {
-            var item = _cache.Get(key);
-            if (item != null && item.GetType() == type)
-                return item;
+            var wrapper = _cache.Get(key) as CacheItemWrapper;
+            if (wrapper != null)
+                return wrapper.Item;
 
-            item = dataRetriever.Invoke();
+            var item = dataRetriever.Invoke();
+
             Add(key, item, timeToLive);
-            return item.GetType() == type ? item : null;
+
+            return item;
         }
 
         public Task<T> GetAsync<T>(string key, Func<Task<T>> dataRetriever) where T : class
@@ -68,13 +78,14 @@ namespace DoubleCache.SystemWebHttpCache
 
         public async Task<T> GetAsync<T>(string key, Func<Task<T>> dataRetriever, TimeSpan? timeToLive) where T : class
         {
-            var item = _cache.Get(key) as T;
-            if (item != null)
-                return item;
-            {
-                item = await dataRetriever.Invoke();
-                Add(key, item, timeToLive);
-            }
+            var wrapper = _cache.Get(key) as CacheItemWrapper;
+            if (wrapper != null)
+                return wrapper.Item as T;
+            
+            var item = await dataRetriever.Invoke();
+
+            Add(key, item, timeToLive);
+            
             return item;
         }
 
@@ -85,13 +96,17 @@ namespace DoubleCache.SystemWebHttpCache
 
         public async Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever, TimeSpan? timeToLive)
         {
-            var item = _cache.Get(key);
-            if (item != null && item.GetType() == type)
-                return item;
+            var wrapper = _cache.Get(key) as CacheItemWrapper;
+            if (wrapper != null)
+                return wrapper.Item;
 
-            item = await dataRetriever.Invoke();
+
+            var item = await dataRetriever.Invoke();
+            item = item.GetType() == type ? item : null;
+
             Add(key, item, timeToLive);
-            return item.GetType() == type ? item : null;
+
+            return item;
         }
 
         public void Remove(string key)
@@ -106,6 +121,11 @@ namespace DoubleCache.SystemWebHttpCache
             return ttl.HasValue
                 ? DateTime.Now.Add(ttl.Value)
                 : DateTime.MaxValue;
+        }
+
+        public bool Exists(string key)
+        {
+            return _cache.Get(key) != null;
         }
     }
 }

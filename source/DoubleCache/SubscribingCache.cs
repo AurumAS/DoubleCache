@@ -72,11 +72,11 @@ namespace DoubleCache
 
         private async void OnCacheUpdate(object sender, CacheUpdateNotificationArgs e)
         {
-            await CacheUpdateAction(sender, e);
+            await CacheUpdateAction(sender, e).ConfigureAwait(false);
         }
         private async Task CacheUpdateAction(object sender, CacheUpdateNotificationArgs e)
         {
-            var remoteItem = await _cacheSubscriber.GetAsync(e.Key, _knownTypes.GetOrAdd(e.Type, Type.GetType(e.Type)));
+            var remoteItem = await _cacheSubscriber.GetAsync(e.Key, _knownTypes.GetOrAdd(e.Type, Type.GetType(e.Type))).ConfigureAwait(false); ;
 
             if (remoteItem != null)
             {
@@ -95,6 +95,11 @@ namespace DoubleCache
         public void Remove(string key)
         {
             _cache.Remove(key);
+        }
+
+        public bool Exists(string key)
+        {
+            return _cache.Exists(key);
         }
 
         public TimeSpan? DefaultTtl { get { return _cache.DefaultTtl;  } }

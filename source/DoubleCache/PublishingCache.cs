@@ -17,13 +17,13 @@ namespace DoubleCache
         public void Add<T>(string key, T item)
         {
             _cache.Add(key, item);
-            _cachePublisher.NotifyUpdate(key, item.GetType().AssemblyQualifiedName);
+            _cachePublisher.NotifyUpdate(key, typeof(T).AssemblyQualifiedName);
         }
 
         public void Add<T>(string key, T item, TimeSpan? timeToLive)
         {
             _cache.Add(key, item, timeToLive);
-            _cachePublisher.NotifyUpdate(key, item.GetType().AssemblyQualifiedName);
+            _cachePublisher.NotifyUpdate(key, typeof(T).AssemblyQualifiedName, timeToLive);
         }
 
         public T Get<T>(string key, Func<T> dataRetriever) where T : class
@@ -169,6 +169,11 @@ namespace DoubleCache
         {
             _cache.Remove(key);
             _cachePublisher.NotifyDelete(key);
+        }
+
+        public bool Exists(string key)
+        {
+            return _cache.Exists(key);
         }
 
         public TimeSpan? DefaultTtl { get { return _cache.DefaultTtl; } }

@@ -1,7 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Web;
-using DoubleCache.SystemWebHttpCache;
+using DoubleCache.SystemWebCaching;
+using Shouldly;
 using Xunit;
 
 namespace DoubleCacheTests.IntegrationTests
