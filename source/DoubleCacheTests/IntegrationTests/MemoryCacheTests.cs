@@ -19,5 +19,10 @@ namespace DoubleCacheTests.IntegrationTests
         {
             Should.Throw<ArgumentNullException>(() => base.Cache_Null_Returns_Null());
         }
+
+        public override void CacheWithTTL_Null_Returns_Null()
+        {
+            Should.Throw<ArgumentNullException>(() => base.CacheWithTTL_Null_Returns_Null());
+        }
     }
 }

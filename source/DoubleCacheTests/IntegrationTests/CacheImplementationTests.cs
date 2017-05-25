@@ -263,5 +263,17 @@ namespace DoubleCacheTests.IntegrationTests
 
             result.ShouldBeNull();
         }
+
+        [Fact]
+        public virtual void CacheWithTTL_Null_Returns_Null()
+        {
+            var key = Guid.NewGuid().ToString();
+
+            _cacheImplementation.Add<string>(key, null, TimeSpan.FromMinutes(1));
+
+            var result = _cacheImplementation.Get(key, () => "a");
+
+            result.ShouldBeNull();
+        }
     }
 }

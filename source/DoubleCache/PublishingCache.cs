@@ -17,13 +17,13 @@ namespace DoubleCache
         public void Add<T>(string key, T item)
         {
             _cache.Add(key, item);
-            _cachePublisher.NotifyUpdate(key, item.GetType().AssemblyQualifiedName);
+            _cachePublisher.NotifyUpdate(key, typeof(T).AssemblyQualifiedName);
         }
 
         public void Add<T>(string key, T item, TimeSpan? timeToLive)
         {
             _cache.Add(key, item, timeToLive);
-            _cachePublisher.NotifyUpdate(key, item.GetType().AssemblyQualifiedName);
+            _cachePublisher.NotifyUpdate(key, typeof(T).AssemblyQualifiedName, timeToLive);
         }
 
         public T Get<T>(string key, Func<T> dataRetriever) where T : class
