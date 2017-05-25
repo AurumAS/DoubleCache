@@ -69,36 +69,43 @@ namespace DoubleCacheTests
             var fakeAction = A.Fake<Func<object>>();
             A.CallTo(() => fakeAction.Invoke()).Returns("b");
 
+            var key = Guid.NewGuid().ToString();
+
             Func<object> method = null;
             A.CallTo(() => _decoratedCache.Get(A<string>._, A<Type>._, A<Func<object>>._))
-                .Invokes(i => method = i.GetArgument<Func<object>>(2))
+                .Invokes(i => {
+                    method = i.GetArgument<Func<object>>(2);
+                    method.Invoke();
+                })
                 .Returns("b");
 
-            _publishingCache.Get("a", typeof(string), fakeAction);
-
-            method.Invoke();
+            _publishingCache.Get(key, typeof(string), fakeAction);
 
             A.CallTo(() => fakeAction.Invoke()).MustHaveHappened(Repeated.Exactly.Once);
-            A.CallTo(() => _publisher.NotifyUpdate("a", typeof(string).AssemblyQualifiedName)).MustHaveHappened(Repeated.Exactly.Once);
+            A.CallTo(() => _publisher.NotifyUpdate(key, typeof(string).AssemblyQualifiedName)).MustHaveHappened(Repeated.Exactly.Once);
         }
 
         [Fact]
         public void Get_WithTimeToLive_WrappedAction_CallsMethodAndPublish()
         {
+            var key = Guid.NewGuid().ToString();
+
             var fakeAction = A.Fake<Func<object>>();
             A.CallTo(() => fakeAction.Invoke()).Returns("b");
 
             Func<object> method = null;
             A.CallTo(() => _decoratedCache.Get(A<string>._, A<Type>._, A<Func<object>>._, TimeSpan.FromSeconds(1)))
-                .Invokes(i => method = i.GetArgument<Func<object>>(2))
+                .Invokes(i => {
+                    method = i.GetArgument<Func<object>>(2);
+                    method.Invoke();
+                    })
                 .Returns("b");
 
-            _publishingCache.Get("a", typeof(string), fakeAction, TimeSpan.FromSeconds(1));
+            _publishingCache.Get(key, typeof(string), fakeAction, TimeSpan.FromSeconds(1));
 
-            method.Invoke();
 
             A.CallTo(() => fakeAction.Invoke()).MustHaveHappened(Repeated.Exactly.Once);
-            A.CallTo(() => _publisher.NotifyUpdate("a", typeof(string).AssemblyQualifiedName, TimeSpan.FromSeconds(1))).MustHaveHappened(Repeated.Exactly.Once);
+            A.CallTo(() => _publisher.NotifyUpdate(key, typeof(string).AssemblyQualifiedName, TimeSpan.FromSeconds(1))).MustHaveHappened(Repeated.Exactly.Once);
         }
 
         [Fact]
@@ -127,12 +134,13 @@ namespace DoubleCacheTests
 
             Func<string> method = null;
             A.CallTo(() => _decoratedCache.Get(A<string>._, A<Func<string>>._))
-                .Invokes(i => method = i.GetArgument<Func<string>>(1))
+                .Invokes(i => {
+                    method = i.GetArgument<Func<string>>(1);
+                    method.Invoke();
+                    })
                 .Returns("b");
 
             _publishingCache.Get("a", fakeAction);
-
-            method.Invoke();
 
             A.CallTo(() => fakeAction.Invoke()).MustHaveHappened(Repeated.Exactly.Once);
             A.CallTo(() => _publisher.NotifyUpdate("a", typeof(string).AssemblyQualifiedName)).MustHaveHappened(Repeated.Exactly.Once);
@@ -146,12 +154,15 @@ namespace DoubleCacheTests
 
             Func<string> method = null;
             A.CallTo(() => _decoratedCache.Get(A<string>._, A<Func<string>>._, TimeSpan.FromSeconds(1)))
-                .Invokes(i => method = i.GetArgument<Func<string>>(1))
+                .Invokes(i =>
+                {
+                    method = i.GetArgument<Func<string>>(1);
+                    method.Invoke();
+                })
                 .Returns("b");
 
             _publishingCache.Get("a", fakeAction, TimeSpan.FromSeconds(1));
 
-            method.Invoke();
 
             A.CallTo(() => fakeAction.Invoke()).MustHaveHappened(Repeated.Exactly.Once);
             A.CallTo(() => _publisher.NotifyUpdate("a", typeof(string).AssemblyQualifiedName, TimeSpan.FromSeconds(1))).MustHaveHappened(Repeated.Exactly.Once);
@@ -172,7 +183,7 @@ namespace DoubleCacheTests
             var fakeAction = A.Fake<Func<Task<object>>>();
             var result = await _publishingCache.GetAsync("a", typeof(string), fakeAction, TimeSpan.FromSeconds(1));
 
-            A.CallTo(() => _decoratedCache.GetAsync("a", typeof(string), A<Func<Task<object>>>._, TimeSpan.FromSeconds(1)))
+            A.CallTo(() => _decoratedCache.GetAsync("a", typeof(string), A<Func<Task<object>>>._, A<TimeSpan?>._))
                 .MustHaveHappened(Repeated.AtLeast.Once);
         }
 
@@ -184,16 +195,16 @@ namespace DoubleCacheTests
 
             Func<Task<object>> method = null;
             A.CallTo(() => _decoratedCache.GetAsync(A<string>._, A<Type>._, A<Func<Task<object>>>._))
-                .Invokes(i => method = i.GetArgument<Func<Task<object>>>(2))
+                .Invokes(i => {
+                    method = i.GetArgument<Func<Task<object>>>(2);
+                    method.Invoke(); })
                 .Returns(Task.FromResult("b"));
                  
             await _publishingCache.GetAsync(
                 "a", 
                 typeof(string), 
                 fakeAction);
-
-            await method.Invoke();
-
+            
             A.CallTo(() => fakeAction.Invoke()).MustHaveHappened(Repeated.Exactly.Once);
             A.CallTo(() => _publisher.NotifyUpdate("a", typeof(string).AssemblyQualifiedName)).MustHaveHappened(Repeated.Exactly.Once);
         }
@@ -201,24 +212,27 @@ namespace DoubleCacheTests
         [Fact]
         public async Task GetAsync_WithTimeToLive_WrappedAction_CallsMethodAndPublish()
         {
+            string key = Guid.NewGuid().ToString();
+
             var fakeAction = A.Fake<Func<Task<object>>>();
             A.CallTo(() => fakeAction.Invoke()).Returns("b");
 
             Func<Task<object>> method = null;
-            A.CallTo(() => _decoratedCache.GetAsync(A<string>._, A<Type>._, A<Func<Task<object>>>._, TimeSpan.FromSeconds(1)))
-                .Invokes(i => method = i.GetArgument<Func<Task<object>>>(2))
+            A.CallTo(() => _decoratedCache.GetAsync(A<string>._, A<Type>._, A<Func<Task<object>>>._, A<TimeSpan?>._))
+                .Invokes(i => {
+                    method = i.GetArgument<Func<Task<object>>>(2);
+                    method.Invoke(); 
+                    })
                 .Returns(Task.FromResult("b"));
 
             await _publishingCache.GetAsync(
-                "a",
+                key,
                 typeof(string),
                 fakeAction,
                 TimeSpan.FromSeconds(1));
-
-            await method.Invoke();
-
+            
             A.CallTo(() => fakeAction.Invoke()).MustHaveHappened(Repeated.Exactly.Once);
-            A.CallTo(() => _publisher.NotifyUpdate("a", typeof(string).AssemblyQualifiedName)).MustHaveHappened(Repeated.Exactly.Once);
+            A.CallTo(() => _publisher.NotifyUpdate(key, typeof(string).AssemblyQualifiedName,A<TimeSpan?>.Ignored)).MustHaveHappened(Repeated.Exactly.Once);
         }
 
         [Fact]
@@ -247,15 +261,16 @@ namespace DoubleCacheTests
 
             Func<Task<string>> method = null;
             A.CallTo(() => _decoratedCache.GetAsync(A<string>._, A<Func<Task<string>>>._))
-                .Invokes(i => method = i.GetArgument<Func<Task<string>>>(1))
+                .Invokes(i => {
+                    method = i.GetArgument<Func<Task<string>>>(1);
+                    method.Invoke();
+                    })
                 .Returns(Task.FromResult("b"));
 
             await _publishingCache.GetAsync(
                 "a",
                 fakeAction);
-
-            await method.Invoke();
-
+            
             A.CallTo(() => fakeAction.Invoke()).MustHaveHappened(Repeated.Exactly.Once);
             A.CallTo(() => _publisher.NotifyUpdate("a", typeof(string).AssemblyQualifiedName)).MustHaveHappened(Repeated.Exactly.Once);
         }
@@ -268,14 +283,17 @@ namespace DoubleCacheTests
 
             Func<Task<string>> method = null;
             A.CallTo(() => _decoratedCache.GetAsync(A<string>._, A<Func<Task<string>>>._, TimeSpan.FromSeconds(1)))
-                .Invokes(i => method = i.GetArgument<Func<Task<string>>>(1))
+                .Invokes(i => {
+                    method = i.GetArgument<Func<Task<string>>>(1);
+                    method.Invoke();
+                    })
                 .Returns(Task.FromResult("b"));
 
             await _publishingCache.GetAsync(
                 "a",
                 fakeAction, TimeSpan.FromSeconds(1));
 
-            await method.Invoke();
+            
 
             A.CallTo(() => fakeAction.Invoke()).MustHaveHappened(Repeated.Exactly.Once);
             A.CallTo(() => _publisher.NotifyUpdate("a", typeof(string).AssemblyQualifiedName, TimeSpan.FromSeconds(1))).MustHaveHappened(Repeated.Exactly.Once);
@@ -296,5 +314,7 @@ namespace DoubleCacheTests
 
             A.CallTo(() => _publisher.NotifyDelete("a")).MustHaveHappened(Repeated.Exactly.Once);
         }
+
+       
     }
 }

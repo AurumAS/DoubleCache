@@ -28,80 +28,141 @@ namespace DoubleCache
 
         public T Get<T>(string key, Func<T> dataRetriever) where T : class
         {
-            return _cache.Get(key, () => {
-                var result = dataRetriever.Invoke();
-                _cachePublisher.NotifyUpdate(key, result.GetType().AssemblyQualifiedName);
-                return result;
+            var executed = false;
+
+            var result =_cache.Get(key, () => {
+                var dataRetrieverResult = dataRetriever.Invoke();
+                executed = true;
+                return dataRetrieverResult;
             });
+
+            if (executed)
+                _cachePublisher.NotifyUpdate(key, result.GetType().AssemblyQualifiedName);
+            return result;
         }
 
         public T Get<T>(string key, Func<T> dataRetriever, TimeSpan? timeToLive) where T : class
         {
-            return _cache.Get(key, () => {
-                var result = dataRetriever.Invoke();
-                _cachePublisher.NotifyUpdate(key, result.GetType().AssemblyQualifiedName, timeToLive);
-                return result;
+            var executed = false;
+            var result = _cache.Get(key, () => {
+                var dataRetrieverResult = dataRetriever.Invoke();
+                executed = true;
+                return dataRetrieverResult;
             }, timeToLive);
+
+            if (executed)
+                _cachePublisher.NotifyUpdate(key, result.GetType().AssemblyQualifiedName, timeToLive);
+            return result;
         }
 
         public object Get(string key, Type type, Func<object> dataRetriever)
         {
-            return _cache.Get(key, type, () => {
-                var result = dataRetriever.Invoke();
-                _cachePublisher.NotifyUpdate(key, result.GetType().AssemblyQualifiedName);
-                return result;
+            bool executed = false;
+            var result = _cache.Get(key, type, () => {
+                var dataRetrieverResult = dataRetriever.Invoke();
+                executed = true;
+                return dataRetrieverResult;
             });
+
+            if (executed)
+                _cachePublisher.NotifyUpdate(key, result.GetType().AssemblyQualifiedName);
+            return result;
         }
 
         public object Get(string key, Type type, Func<object> dataRetriever, TimeSpan? timeToLive)
         {
-            return _cache.Get(key, type, () => {
-                var result = dataRetriever.Invoke();
-                _cachePublisher.NotifyUpdate(key, result.GetType().AssemblyQualifiedName, timeToLive);
-                return result;
+            bool executed = false;
+
+            var result = _cache.Get(key, type, () => {
+                var dataRetrieverResult = dataRetriever.Invoke();
+                executed = true;
+                return dataRetrieverResult;
             }, timeToLive);
+            
+            if (executed)
+                _cachePublisher.NotifyUpdate(key, result.GetType().AssemblyQualifiedName, timeToLive);
+
+            return result;
         }
 
-        public Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever)
+        public async Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever)
         {
+            bool executed = false;
+            string qualifiedTypeName = null;
             Func<Task<object>> wrappedAction = async () => {
-                var result = await dataRetriever.Invoke();
-                var qualifiedTypeName = result.GetType().AssemblyQualifiedName;
+                var dataRetrieverResult = await dataRetriever.Invoke();
+                qualifiedTypeName = dataRetrieverResult.GetType().AssemblyQualifiedName;
+                executed = true;
+                return dataRetrieverResult;
+            };
+            
+            var result =  await _cache.GetAsync(key, type, wrappedAction);
+
+            if (executed)
                 _cachePublisher.NotifyUpdate(key, qualifiedTypeName);
-                return result;
+
+            return result;
+        }
+
+        public async Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever, TimeSpan? timeToLive)
+        {
+            bool executed = false;
+            string qualifiedTypeName = null;
+
+            Func<Task<object>> wrappedAction = async () => {
+                var dataRetrieverResult = await dataRetriever.Invoke();
+                qualifiedTypeName = dataRetrieverResult.GetType().AssemblyQualifiedName;
+                executed = true;
+                return dataRetrieverResult;
             };
 
-            return  _cache.GetAsync(key, type, wrappedAction);
+            var result = await _cache.GetAsync(key, type, wrappedAction,timeToLive);
+
+            if (executed)
+                _cachePublisher.NotifyUpdate(key, qualifiedTypeName,timeToLive);
+
+            return result;
         }
 
-        public Task<object> GetAsync(string key, Type type, Func<Task<object>> dataRetriever, TimeSpan? timeToLive)
+        public async Task<T> GetAsync<T>(string key, Func<Task<T>> dataRetriever) where T : class
         {
-            Func<Task<object>> wrappedAction = async () => {
-                var result = await dataRetriever.Invoke();
-                var qualifiedTypeName = result.GetType().AssemblyQualifiedName;
-                _cachePublisher.NotifyUpdate(key, qualifiedTypeName);
-                return result;
+            bool executed = false;
+            Type qualifiedType = null;
+
+            Func<Task<T>> wrappedAction = async () =>
+            {
+                var dataRetrieverResult = await dataRetriever.Invoke();
+                qualifiedType = dataRetrieverResult.GetType();
+                executed = true;
+                return dataRetrieverResult;
             };
 
-            return _cache.GetAsync(key, type, wrappedAction,timeToLive);
+            var result = await _cache.GetAsync(key, wrappedAction);
+            if (executed)
+                _cachePublisher.NotifyUpdate(key, qualifiedType.AssemblyQualifiedName);
+
+            return result;
         }
 
-        public Task<T> GetAsync<T>(string key, Func<Task<T>> dataRetriever) where T : class
+        public async Task<T> GetAsync<T>(string key, Func<Task<T>> dataRetriever, TimeSpan? timeToLive) where T : class
         {
-            return  _cache.GetAsync(key, async() => {
-                var result = await dataRetriever.Invoke();
-                _cachePublisher.NotifyUpdate(key, result.GetType().AssemblyQualifiedName);
-                return result;
-            });
-        }
+            bool executed = false;
+            Type qualifiedType = null;
 
-        public Task<T> GetAsync<T>(string key, Func<Task<T>> dataRetriever, TimeSpan? timeToLive) where T : class
-        {
-            return _cache.GetAsync(key, async () => {
-                var result = await dataRetriever.Invoke();
-                _cachePublisher.NotifyUpdate(key, result.GetType().AssemblyQualifiedName, timeToLive);
-                return result;
-            }, timeToLive);
+            Func<Task<T>> wrappedAction = async () =>
+            {
+                var dataRetrieverResult = await dataRetriever.Invoke();
+                qualifiedType = dataRetrieverResult.GetType();
+                executed = true;
+                return dataRetrieverResult;
+            };
+
+            var result = await _cache.GetAsync(key, wrappedAction, timeToLive);
+            if (executed)
+                _cachePublisher.NotifyUpdate(key, qualifiedType.AssemblyQualifiedName, timeToLive);
+
+            return result;
+
         }
 
         public void Remove(string key)

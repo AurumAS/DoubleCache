@@ -37,13 +37,11 @@
       <HintPath>..\packages\Castle.Core.2.5.2\lib\NET35\Castle.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="FakeItEasy, Version=1.25.3.0, Culture=neutral, PublicKeyToken=eff28e2146d5fd2c, processorArchitecture=MSIL">
-      <HintPath>..\packages\FakeItEasy.1.25.3\lib\net40\FakeItEasy.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="FakeItEasy, Version=3.3.2.0, Culture=neutral, PublicKeyToken=eff28e2146d5fd2c, processorArchitecture=MSIL">
+      <HintPath>..\packages\FakeItEasy.3.3.2\lib\net40\FakeItEasy.dll</HintPath>
     </Reference>
-    <Reference Include="Shouldly, Version=2.6.0.0, Culture=neutral, PublicKeyToken=6042cbcb05cbc941, processorArchitecture=MSIL">
-      <HintPath>..\packages\Shouldly.2.6.0\lib\net40\Shouldly.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Shouldly, Version=2.8.2.0, Culture=neutral, PublicKeyToken=6042cbcb05cbc941, processorArchitecture=MSIL">
+      <HintPath>..\packages\Shouldly.2.8.2\lib\net40\Shouldly.dll</HintPath>
     </Reference>
     <Reference Include="StackExchange.Redis, Version=1.0.316.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\StackExchange.Redis.1.0.488\lib\net45\StackExchange.Redis.dll</HintPath>
@@ -84,6 +82,7 @@
     <Compile Include="PublishingCacheTests.cs" />
     <Compile Include="IntegrationTests\RedisCacheIntegrationTests.cs" />
     <Compile Include="RedisFixture.cs" />
+    <Compile Include="RedisPublishingCacheTests.cs" />
     <Compile Include="RedisStaleCacheTests.cs" />
     <Compile Include="RedisSubscriberTests.cs" />
     <Compile Include="Serialization\CacheNotificationDataAttribute.cs" />
@@ -93,7 +92,7 @@
     <Compile Include="SubscribingCacheTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\packages\redis-64.2.8.2104\tools\redis.windows.conf">
+    <None Include="..\packages\redis-64.3.0.503\tools\redis.windows.conf">
       <Link>Redis\redis.windows.conf</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -114,7 +113,7 @@
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\packages\redis-64.2.8.2104\tools\redis-server.exe">
+    <Content Include="..\packages\redis-64.3.0.503\tools\redis-server.exe">
       <Link>Redis\redis-server.exe</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
