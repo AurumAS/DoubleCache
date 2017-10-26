@@ -16,12 +16,14 @@ namespace DoubleCacheTests
         private ICacheAside _remoteCache;
         private IItemSerializer _itemSerializer;
         private IConnectionMultiplexer _connection;
+        private string _expectedClientName;
 
         public RedisSubscriberTests()
         {
             _subscriber = A.Fake<ISubscriber>();
             _remoteCache = A.Fake<ICacheAside>();
             _itemSerializer = A.Fake<IItemSerializer>();
+            _expectedClientName = "A." + System.AppDomain.CurrentDomain.FriendlyName;
 
             _connection = A.Fake<IConnectionMultiplexer>();
             A.CallTo(() => _connection.GetSubscriber(A<object>._)).Returns(_subscriber);
@@ -86,7 +88,7 @@ namespace DoubleCacheTests
 
             var eventHandler = A.Fake<EventHandler<CacheUpdateNotificationArgs>>();
 
-            A.CallTo(() => _itemSerializer.Deserialize<CacheUpdateNotificationArgs>(A<byte[]>._)).Returns(new CacheUpdateNotificationArgs() { ClientName ="A" });
+            A.CallTo(() => _itemSerializer.Deserialize<CacheUpdateNotificationArgs>(A<byte[]>._)).Returns(new CacheUpdateNotificationArgs() { ClientName = _expectedClientName });
 
             var cacheSubscriber = new RedisSubscriber(_connection, _remoteCache, _itemSerializer);
 
@@ -101,7 +103,7 @@ namespace DoubleCacheTests
         [Theory]
         [InlineData("cacheUpdate")]
         [InlineData("cacheDelete")]
-        public void OnMessage_SameClientName_EventNotTriggered(string channelName)
+        public void OnMessage_SameClientNameSameApplicationName_EventNotTriggered(string channelName)
         {
             Action<RedisChannel, RedisValue> method = null;
 
@@ -113,7 +115,7 @@ namespace DoubleCacheTests
 
             var eventHandler = A.Fake<EventHandler<CacheUpdateNotificationArgs>>();
 
-            A.CallTo(() => _itemSerializer.Deserialize<CacheUpdateNotificationArgs>(A<byte[]>._)).Returns(new CacheUpdateNotificationArgs() { ClientName = "A" });
+            A.CallTo(() => _itemSerializer.Deserialize<CacheUpdateNotificationArgs>(A<byte[]>._)).Returns(new CacheUpdateNotificationArgs() { ClientName = _expectedClientName });
 
             var cacheSubscriber = new RedisSubscriber(_connection, _remoteCache, _itemSerializer);
 
