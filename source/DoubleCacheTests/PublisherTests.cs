@@ -13,6 +13,7 @@ namespace DoubleCacheTests
         private IConnectionMultiplexer _connection;
         private IItemSerializer _serializer;
         private ISubscriber _subscriber;
+        private string _expectedClientName;
 
         private ICachePublisher publisher;
 
@@ -21,6 +22,7 @@ namespace DoubleCacheTests
             _connection = A.Fake<IConnectionMultiplexer>();
             _serializer = A.Fake<IItemSerializer>();
             _subscriber = A.Fake<ISubscriber>();
+            _expectedClientName = "C." + System.AppDomain.CurrentDomain.FriendlyName;
 
             A.CallTo(() => _connection.GetSubscriber(null)).Returns(_subscriber);
             A.CallTo(() => _connection.ClientName).Returns("C");
@@ -35,7 +37,7 @@ namespace DoubleCacheTests
             publisher.NotifyUpdate("A", "B");
 
             A.CallTo(() => _serializer.Serialize(
-                    A<CacheUpdateNotificationArgs>.That.Matches(args => args.Key == "A" && args.Type == "B" && args.ClientName == "C")))
+                    A<CacheUpdateNotificationArgs>.That.Matches(args => args.Key == "A" && args.Type == "B" && args.ClientName == _expectedClientName)))
                 .MustHaveHappened(Repeated.Exactly.Once);
         }
 
@@ -45,7 +47,7 @@ namespace DoubleCacheTests
             publisher.NotifyDelete("A");
 
             A.CallTo(() => _serializer.Serialize(
-                    A<CacheUpdateNotificationArgs>.That.Matches(args => args.Key == "A" && args.ClientName == "C")))
+                    A<CacheUpdateNotificationArgs>.That.Matches(args => args.Key == "A" && args.ClientName == _expectedClientName)))
                 .MustHaveHappened(Repeated.Exactly.Once);
         }
 

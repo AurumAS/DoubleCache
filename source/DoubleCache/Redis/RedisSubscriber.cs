@@ -21,7 +21,7 @@ namespace DoubleCache.Redis
             connection.GetSubscriber().Subscribe("cacheDelete", CacheDeleted);
             _remoteCache = remoteCache;
             _itemSerializer = itemSerializer;
-            _clientName = connection.ClientName;
+            _clientName = connection.ClientName + "." + System.AppDomain.CurrentDomain.FriendlyName;
         }
 
         private void CacheUpdated(RedisChannel channel, RedisValue message)
